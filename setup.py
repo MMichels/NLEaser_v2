@@ -1,0 +1,12 @@
+# CONFIGS FLASK
+DEBUG = True
+SECRET_KEY = "8eecf942-0f42-11eb-adc1-0242ac120002"
+JWT_SECRET_KEY = SECRET_KEY
+ENV = "development"
+HOST = "localhost"
+PORT = 5000
+
+# CONFIGS DB
+MONGO_HOST = "localhost"
+MONGO_PORT = 27017
+MONGO_DB = "nleaser"
