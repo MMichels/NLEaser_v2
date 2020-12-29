@@ -11,4 +11,12 @@ def create_app():
     api.init_app(app)
     jwt.init_app(app)
     connect_db()
+
+    @app.after_request
+    def enable_cors(response):
+        response.headers.add("Access-Control-Allow-Headers", "content-type")
+        response.headers.add("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT")
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        return response
+
     return app
