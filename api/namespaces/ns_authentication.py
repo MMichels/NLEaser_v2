@@ -35,7 +35,7 @@ class LoginResource(Resource):
             access_token = create_access_token(self.schema.dump(user))
             return {
                 "access_token": access_token
-            }
+            }, 201
 
         else:
             return {

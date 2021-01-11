@@ -21,7 +21,7 @@ post_model = {
 
 
 post_response_model = {
-    "id": fields.Integer(
+    "id": fields.String(
         description="Id do usuário cadastrado"
     )
 }

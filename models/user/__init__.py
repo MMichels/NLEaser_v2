@@ -4,7 +4,10 @@ import marshmallow as ma
 
 
 class UserModel(me.Document):
-    email = me.fields.EmailField(primary_key=True)
+    meta = {
+        'collection': 'user'
+    }
+    email = me.fields.EmailField(unique=True)
     password = me.fields.StringField(required=True)
     name = me.fields.StringField(max_length=150, required=True)
     created_at = me.fields.DateTimeField(default=datetime.datetime.now)

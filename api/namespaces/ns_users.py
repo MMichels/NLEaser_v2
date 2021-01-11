@@ -1,5 +1,4 @@
 from flask import request
-from flask_jwt_extended import jwt_required
 from flask_restplus import Namespace, Resource, Model
 
 from api.error_handler import error_handler
@@ -8,6 +7,7 @@ from api.request_models.user_api_models import post_model, post_response_model
 from sources.user import create_new_user
 from sources.logger import create_logger
 
+from mongoengine.errors import NotUniqueError
 
 logger = create_logger(__name__)
 
@@ -27,5 +27,11 @@ class UsersResource(Resource):
     def post(self):
         args = request.get_json()
         create_user_model.validate(args)
-        new_user = create_new_user(**args)
-        return new_user.id, 201
+        try:
+            new_user = create_new_user(**args)
+            return {'id': str(new_user.id)}, 201
+        except NotUniqueError as nu:
+            return {
+                       "status": "alrealy_exists",
+                       "error": "Já existe um usuário com o email " + args['email']
+                   }, 409
