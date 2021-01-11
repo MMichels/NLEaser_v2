@@ -21,8 +21,8 @@ login_response_model = ns_authentication.model("login_response_model", post_resp
 class LoginResource(Resource):
     schema = UserSchema()
 
-    @ns_authentication.expect(login_model)
-    @ns_authentication.marshal_with(login_response_model, code=200)
+    @ns_authentication.expect(login_model, validate=False)
+    @ns_authentication.marshal_with(login_response_model, code=201)
     @ns_authentication.doc(security=None)
     @error_handler(logger)
     def post(self):
@@ -35,7 +35,7 @@ class LoginResource(Resource):
             access_token = create_access_token(self.schema.dump(user))
             return {
                 "access_token": access_token
-            }, 201
+            }
 
         else:
             return {

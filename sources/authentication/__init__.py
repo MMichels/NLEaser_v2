@@ -11,3 +11,7 @@ def authenticate(email, password):
         return user
 
 
+@jwt.user_loader_callback_loader
+def get_current_user(identity):
+    user = UserModel.objects(email=identity['email']).first()
+    return user

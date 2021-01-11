@@ -1,4 +1,4 @@
-from flask_restplus import Resource, fields
+from flask_restplus import fields
 
 from api.request_models import make_response_model
 
