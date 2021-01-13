@@ -4,6 +4,7 @@ from flask_jwt_extended import get_current_user
 from werkzeug.datastructures import FileStorage
 
 from models.datafile import DataFileSchema, DataFileModel
+from models.user import  UserModel
 from sources.datafile.util import generate_df_hash, open_file
 from sources.datafile.exceptions import TextColumnNotFound
 
@@ -40,3 +41,13 @@ def import_data_file(file: FileStorage, format: str, text_column: str, language:
     else:
         data_file.save()
     return data_file
+
+
+def list_data_files(orderby: str = "name", order_ascending: bool = True):
+    user: UserModel = get_current_user()
+    documents = DataFileModel.objects(
+        owner=user.id,
+    ).order_by(
+        ("+" if order_ascending else "-") + orderby
+    ).all()
+    return documents

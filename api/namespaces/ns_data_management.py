@@ -1,12 +1,14 @@
 from flask import request
 from flask_jwt_extended import jwt_required
-from flask_restplus import Namespace, Resource
+from flask_restplus import Namespace, Resource, Model, fields
 
 from api.error_handler import error_handler
-from api.request_models.data_management_api_models import post_model, post_response_model
+from api.request_models.data_management_api_models import datafile_model, get_model, get_response_model, post_model, \
+    post_response_model
 
+from models.datafile import DataFileSchema
 from sources.logger import create_logger
-from sources.datafile import import_data_file
+from sources.datafile import import_data_file, list_data_files
 
 from mongoengine.errors import NotUniqueError
 from sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound
@@ -18,11 +20,25 @@ ns_data_management = Namespace(
     "Namespace para enviar, alterar, excluir e recuperar os datasets do usuário"
 )
 
-upload_response_model = ns_data_management.model("upload_response_model", post_response_model)
+# POST
+upload_response_model: Model = ns_data_management.model("upload_response_model", post_response_model)
+
+# GET
+list_datafiles_model: Model = ns_data_management.model("list_datafiles_model", get_model)
+list_datafiles_response_model = get_response_model.copy()
+list_datafiles_response_model["documents"] = fields.Nested(
+    ns_data_management.model("datafile_model", datafile_model, mask=None),
+    as_list=True, mask=None
+)
+
+list_datafiles_response_model: Model = ns_data_management.model(name="list_datafiles_response_model",
+                                                                model=list_datafiles_response_model,
+                                                                mask=None)
 
 
 @ns_data_management.route("")
 class DataManagementResource(Resource):
+    schema = DataFileSchema()
 
     @ns_data_management.expect(post_model, validate=False)
     @ns_data_management.marshal_with(upload_response_model, code=201)
@@ -37,14 +53,14 @@ class DataManagementResource(Resource):
             }
         except NotUniqueError:
             return {
-                'status': 'alrealy_exists',
-                'error': 'Você ja realizou o upload deste arquivo.'
-            }, 409
+                       'status': 'alrealy_exists',
+                       'error': 'Você ja realizou o upload deste arquivo.'
+                   }, 409
         except TextColumnNotFound as e:
             return {
-                "status": "column_not_found",
-                "error": e.args[0]
-            }, 409
+                       "status": "column_not_found",
+                       "error": e.args[0]
+                   }, 409
         except FileReadException as fre:
             logger.error(
                 "Ocorreu um erro ao ler o arquivo do usuário",
@@ -52,10 +68,10 @@ class DataManagementResource(Resource):
                 extra={"received_args": args}
             )
             return {
-                'status': "file_read_error",
-                "error": "Ocorreu um erro ao ler o arquivo, isso normalmente é causado por um arquivo mal formatado, "
-                         "corrompido ou então um formato não suportado até o momento"
-            }, 415
+                       'status': "file_read_error",
+                       "error": "Ocorreu um erro ao ler o arquivo, isso normalmente é causado por um arquivo mal formatado, "
+                                "corrompido ou então um formato não suportado até o momento"
+                   }, 415
         except InvalidFormatException as fie:
             logger.error(
                 "O formato de arquivo informado não é suportado no momento",
@@ -63,19 +79,27 @@ class DataManagementResource(Resource):
                 extra={"received_args": args}
             )
             return {
-                'status': "invalid_format",
-                "error": "Desculpe, mas atualmente não fornecemos suporte ao tipo de arquivo informado, "
-                         "converta seu arquivo para um dos formatos suportados e tente novamente."
-            }, 415
+                       'status': "invalid_format",
+                       "error": "Desculpe, mas atualmente não fornecemos suporte ao tipo de arquivo informado, "
+                                "converta seu arquivo para um dos formatos suportados e tente novamente."
+                   }, 415
 
-
+    @ns_data_management.expect(list_datafiles_model, validate=False)
+    @ns_data_management.marshal_with(list_datafiles_response_model)
     @error_handler(logger)
+    @jwt_required
     def get(self):
-        return 200
+        args = request.get_json()
+        list_datafiles_model.validate(args)
 
-    @error_handler(logger)
-    def put(self):
-        return 200
+        documents = list_data_files(**args)
+
+        result = {
+            "documents": self.schema.dump(documents, many=True),
+            "total": documents.count()
+        }
+
+        return result
 
     @error_handler(logger)
     def delete(self):
