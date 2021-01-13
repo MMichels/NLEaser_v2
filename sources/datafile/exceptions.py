@@ -10,3 +10,8 @@ class InvalidFormatException(Exception):
 
 class TextColumnNotFound(Exception):
     pass
+
+
+class NotAuthorized(Exception):
+    # O usuário não tem permissão para realizar algum acesso/modificação
+    pass

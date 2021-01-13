@@ -3,15 +3,16 @@ from flask_jwt_extended import jwt_required
 from flask_restplus import Namespace, Resource, Model, fields
 
 from api.error_handler import error_handler
-from api.request_models.data_management_api_models import datafile_model, get_model, get_response_model, post_model, \
-    post_response_model
+from api.request_models.data_management_api_models import datafile_model, delete_model, delete_response_model, \
+    get_model, get_response_model, \
+    post_model, post_response_model
 
 from models.datafile import DataFileSchema
 from sources.logger import create_logger
-from sources.datafile import import_data_file, list_data_files
+from sources.datafile import import_data_file, list_data_files, delete_data_file
 
 from mongoengine.errors import NotUniqueError
-from sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound
+from sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound, NotAuthorized
 
 logger = create_logger(__name__)
 
@@ -35,6 +36,10 @@ list_datafiles_response_model: Model = ns_data_management.model(name="list_dataf
                                                                 model=list_datafiles_response_model,
                                                                 mask=None)
 
+# DELETE
+delete_datafile_model: Model = ns_data_management.model("delete_datafile_model", delete_model)
+delete_datafile_response_model: Model = ns_data_management.model("delete_datafile_response_model", delete_response_model)
+
 
 @ns_data_management.route("")
 class DataManagementResource(Resource):
@@ -49,7 +54,7 @@ class DataManagementResource(Resource):
         try:
             datafile = import_data_file(**args)
             return {
-                'hash': datafile.hash
+                'id': datafile.id
             }
         except NotUniqueError:
             return {
@@ -101,6 +106,27 @@ class DataManagementResource(Resource):
 
         return result
 
+    @ns_data_management.expect(delete_datafile_model, validate=False)
+    @ns_data_management.marshal_with(delete_datafile_response_model)
     @error_handler(logger)
+    @jwt_required
     def delete(self):
-        return 200
+        args = request.get_json()
+        delete_datafile_model.validate(args)
+        try:
+            deleted = delete_data_file(**args)
+            return {
+                "deleted": deleted
+            }
+        except NotAuthorized:
+            return {
+                "status": "not_authorized",
+                "error": "Você não possui altorização para excluir esse arquivo"
+            }, 403
+        except FileNotFoundError as fn:
+            return {
+                "status": "not_found",
+                "error": fn.args[0]
+            }, 404
+
+

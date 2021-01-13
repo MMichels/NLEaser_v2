@@ -31,9 +31,3 @@ def open_file(file: FileStorage, format: str, sep: str):
         raise InvalidFormatException("Não é possivel ler o formato " + format)
     return df
 
-
-def generate_df_hash(df: pd.DataFrame):
-    samples = df.sample(frac=0.5, random_state=42)
-    rows_hash = pd.util.hash_pandas_object(samples)
-    file_hash = hash(tuple(rows_hash.tolist()))
-    return str(file_hash)

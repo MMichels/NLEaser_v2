@@ -11,7 +11,6 @@ class DataFileModel(me.Document):
     }
 
     owner = me.fields.ReferenceField(UserModel)
-    hash = me.fields.StringField(required=True, unique_with='owner')
     name = me.fields.StringField()
     format = me.fields.StringField(required=True, choices=['csv', 'xlsx', 'txt'])
     language = me.fields.StringField(required=True)
@@ -21,7 +20,7 @@ class DataFileModel(me.Document):
 
 
 class DataFileSchema(ma.Schema):
-    hash = ma.fields.String(required=True)
+    id = ma.fields.String(required=True, dump_only=True)
     name = ma.fields.String()
     format = ma.fields.String(required=True)
     language = ma.fields.String(required=True)

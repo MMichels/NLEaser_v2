@@ -34,14 +34,6 @@ post_model.add_argument(
     help="Idioma das frases do arquivo"
 )
 post_model.add_argument(
-    'overwrite',
-    required=False,
-    location="args",
-    type=bool,
-    help="Em caso de arquivo duplicado, sobrescreve as informacoes",
-    default=False
-)
-post_model.add_argument(
     'separador',
     required=False,
     location="args",
@@ -51,7 +43,7 @@ post_model.add_argument(
 )
 
 post_response_model = {
-    "hash": fields.String(
+    "id": fields.String(
         description="Hash de identificação dos dados."
     )
 }
@@ -72,7 +64,7 @@ get_model = {
 
 
 datafile_model = {
-    "hash": fields.String(),
+    "id": fields.String(),
     "name": fields.String(),
     "language": fields.String(),
     "text_column": fields.String(),
@@ -84,3 +76,17 @@ get_response_model = {
 }
 
 get_response_model = make_response_model(get_response_model)
+
+
+##### DELETE MODELS
+delete_model = {
+    "id": fields.String(
+        required=True,
+        description="Identificador do arquivo"
+    )
+}
+
+delete_response_model = {
+    "deleted": fields.Boolean()
+}
+delete_response_model = make_response_model(delete_response_model)
