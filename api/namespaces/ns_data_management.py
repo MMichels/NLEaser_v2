@@ -9,7 +9,7 @@ from api.request_models.data_management_api_models import datafile_model, delete
 
 from models.datafile import DataFileSchema
 from sources.logger import create_logger
-from sources.datafile import import_data_file, list_data_files, delete_data_file
+from sources.datafile import import_data_file, list_all_user_data_files, delete_data_file
 
 from mongoengine.errors import NotUniqueError
 from sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound, NotAuthorized
@@ -57,11 +57,13 @@ class DataManagementResource(Resource):
                 'id': datafile.id
             }
         except NotUniqueError:
+            logger.warning("Duplicidade de arquivos", exc_info=True)
             return {
                        'status': 'alrealy_exists',
                        'error': 'Você ja realizou o upload deste arquivo.'
                    }, 409
         except TextColumnNotFound as e:
+            logger.warning(e.args[0], exc_info=True)
             return {
                        "status": "column_not_found",
                        "error": e.args[0]
@@ -97,7 +99,7 @@ class DataManagementResource(Resource):
         args = request.get_json()
         list_datafiles_model.validate(args)
 
-        documents = list_data_files(**args)
+        documents = list_all_user_data_files(**args)
 
         result = {
             "documents": self.schema.dump(documents, many=True),

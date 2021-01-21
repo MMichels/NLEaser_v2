@@ -21,9 +21,9 @@ post_model.add_argument(
 )
 post_model.add_argument(
     'text_column',
-    required=True,
     location="args",
     type=str,
+    default="sentences",
     help="Coluna que contém as sentenças"
 )
 post_model.add_argument(

@@ -14,6 +14,7 @@ class UserModel(me.Document):
 
 
 class UserSchema(ma.Schema):
+    id = ma.fields.String(required=True, dump_only=True)
     email = ma.fields.String(required=True)
     password = ma.fields.String(required=True, load_only=True)
     name = ma.fields.String(required=True, max_length=150)
