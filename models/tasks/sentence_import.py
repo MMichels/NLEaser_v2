@@ -8,7 +8,7 @@ from models.tasks.datafile_import import DataFileImportModel, DataFileImportSche
 
 class SentenceImportModel(DataFileImportModel):
     task_name = me.fields.StringField(default="sentence_import")
-    parent = me.fields.ReferenceField(DataFileImportModel, required=True)
+    parent: DataFileImportModel = me.fields.ReferenceField(DataFileImportModel, required=True)
     content = me.fields.StringField(required=True)
     index = me.fields.IntField(required=True)
 

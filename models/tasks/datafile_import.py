@@ -12,7 +12,7 @@ class DataFileImportModel(TaskModel):
     }
 
     task_name = me.fields.StringField(default="datafile_import")
-    datafile = me.fields.ReferenceField(DataFileModel, required=True)
+    datafile: DataFileModel = me.fields.ReferenceField(DataFileModel, required=True)
 
 
 class DataFileImportSchema(TaskSchema):

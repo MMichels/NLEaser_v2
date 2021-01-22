@@ -1,7 +1,7 @@
 import sys, os
 import logging
 from datetime import datetime
-from mongoengine import Document, StringField, DateTimeField, DynamicField
+from mongoengine import Document, StringField, DateTimeField, DynamicField, IntField
 
 
 class DBLogModel(Document):
@@ -23,7 +23,8 @@ class DBLogModel(Document):
     stack = StringField(default='')
     exceptionType = StringField(default='')
     exceptionDetails = DynamicField(default={})
-    timestamp = DateTimeField(default=datetime.utcnow)
+    level = StringField()
+    timestamp = DateTimeField(default=datetime.now)
 
     def save(self):
         """
@@ -55,7 +56,8 @@ class DBLogHandler(logging.Handler):
         log = DBLogModel(
             emiter=record.name,
             args=record.received_args if 'received_args' in record.__dict__.keys() else '',
-            message=msg
+            message=msg,
+            level=record.levelname
         )
         log.save()
 

@@ -13,7 +13,7 @@ class DataFileModel(me.Document):
     owner = me.fields.ReferenceField(UserModel)
     name = me.fields.StringField()
     format = me.fields.StringField(required=True, choices=['csv', 'xlsx', 'txt'])
-    language = me.fields.StringField(required=True)
+    language = me.fields.StringField(required=True, choices=["portuguese", "english"])
     text_column = me.fields.StringField(required=True)
     created_at = me.fields.DateTimeField(default=datetime.datetime.now)
     excluded = me.fields.BooleanField(default=False)

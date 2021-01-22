@@ -31,7 +31,8 @@ post_model.add_argument(
     required=True,
     location="args",
     type=str,
-    help="Idioma das frases do arquivo"
+    help="Idioma das frases do arquivo",
+    choices=["english", "portuguese"]
 )
 post_model.add_argument(
     'separador',

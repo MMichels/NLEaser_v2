@@ -5,11 +5,11 @@ from sources.rabbit import RabbitConector
 
 class RabbitConsumer(RabbitConector):
 
-    def consume(self, callback, auto_ack=True):
+    def consume(self, callback, auto_ack=True, prefetch=1):
         if self.channel is None:
             self.connect()
 
-        self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_qos(prefetch_count=prefetch)
         self.channel.basic_consume(
             queue=self.queue,
             auto_ack=auto_ack,
