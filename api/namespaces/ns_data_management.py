@@ -25,7 +25,7 @@ ns_data_management = Namespace(
 upload_response_model: Model = ns_data_management.model("upload_response_model", post_response_model)
 
 # GET
-list_datafiles_model: Model = ns_data_management.model("list_datafiles_model", get_model)
+
 list_datafiles_response_model = get_response_model.copy()
 list_datafiles_response_model["documents"] = fields.Nested(
     ns_data_management.model("datafile_model", datafile_model, mask=None),
@@ -37,8 +37,8 @@ list_datafiles_response_model: Model = ns_data_management.model(name="list_dataf
                                                                 mask=None)
 
 # DELETE
-delete_datafile_model: Model = ns_data_management.model("delete_datafile_model", delete_model)
-delete_datafile_response_model: Model = ns_data_management.model("delete_datafile_response_model", delete_response_model)
+delete_datafile_response_model: Model = ns_data_management.model("delete_datafile_response_model",
+                                                                 delete_response_model)
 
 
 @ns_data_management.route("")
@@ -57,13 +57,11 @@ class DataManagementResource(Resource):
                 'id': datafile.id
             }
         except NotUniqueError:
-            logger.warning("Duplicidade de arquivos", exc_info=True)
             return {
                        'status': 'alrealy_exists',
                        'error': 'Você ja realizou o upload deste arquivo.'
                    }, 409
         except TextColumnNotFound as e:
-            logger.warning(e.args[0], exc_info=True)
             return {
                        "status": "column_not_found",
                        "error": e.args[0]
@@ -91,13 +89,12 @@ class DataManagementResource(Resource):
                                 "converta seu arquivo para um dos formatos suportados e tente novamente."
                    }, 415
 
-    @ns_data_management.expect(list_datafiles_model, validate=False)
+    @ns_data_management.expect(get_model, validate=False)
     @ns_data_management.marshal_with(list_datafiles_response_model)
     @error_handler(logger)
     @jwt_required
     def get(self):
-        args = request.get_json()
-        list_datafiles_model.validate(args)
+        args = get_model.parse_args()
 
         documents = list_all_user_data_files(**args)
 
@@ -108,13 +105,13 @@ class DataManagementResource(Resource):
 
         return result
 
-    @ns_data_management.expect(delete_datafile_model, validate=False)
+    @ns_data_management.expect(delete_model, validate=False)
     @ns_data_management.marshal_with(delete_datafile_response_model)
     @error_handler(logger)
     @jwt_required
     def delete(self):
-        args = request.get_json()
-        delete_datafile_model.validate(args)
+        args = delete_model.parse_args()
+
         try:
             deleted = delete_data_file(**args)
             return {
@@ -122,13 +119,11 @@ class DataManagementResource(Resource):
             }
         except NotAuthorized:
             return {
-                "status": "not_authorized",
-                "error": "Você não possui altorização para excluir esse arquivo"
-            }, 403
+                       "status": "not_authorized",
+                       "error": "Você não possui altorização para excluir esse arquivo"
+                   }, 403
         except FileNotFoundError as fn:
             return {
-                "status": "not_found",
-                "error": fn.args[0]
-            }, 404
-
-
+                       "status": "not_found",
+                       "error": fn.args[0]
+                   }, 404
