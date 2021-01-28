@@ -3,9 +3,8 @@ import json
 from mongoengine import NotUniqueError
 from pika.channel import Channel
 
-from models import connect_db
 from models.tasks.datafile_import import DataFileImportModel
-from models.tasks.sentence_import import SentenceImportModel, SentenceImportSchema
+from models.tasks.sentence_import import SentenceImportModel
 from models.sentence import SentenceModel, SentenceSchema
 
 from sources.logger import create_logger
@@ -17,7 +16,7 @@ logger = create_logger("sentence_import")
 def preprocess_sentence(sentence: str, language: str) -> str:
     p_sentence = sentence.lower()
 
-    tokens = tokenize(p_sentence)
+    tokens = tokenize(p_sentence, language)
     tokens = map(remove_token_accents, tokens)
     tokens = map(mask_token_numbers, tokens)
 
@@ -132,22 +131,3 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
 
     return True
 
-
-if __name__ == '__main__':
-    import time
-    import logging
-    from sources.rabbit.consumer import RabbitConsumer
-
-    while True:
-        connect_db()
-        pika_logger = logging.getLogger("pika")
-        pika_logger.setLevel(logging.ERROR)
-        try:
-            logger.info("Conectando ao rabbitmq")
-            consumer = RabbitConsumer("NLEaser.sentence_import")
-            logger.info("Consumindo")
-            consumer.consume(sentence_preprocessor_consumer, auto_ack=False, prefetch=10)
-
-        except Exception as e:
-            logger.error("Erro ao consumir mensagem", exc_info=True)
-            time.sleep(5)
