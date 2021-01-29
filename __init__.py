@@ -1,7 +1,7 @@
 from flask import Flask
 
 from api import api
-from sources.authentication import jwt
+from sources.authentication.services import jwt
 from models import connect_db
 
 

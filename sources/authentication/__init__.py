@@ -1,17 +1,18 @@
-from flask_jwt_extended import JWTManager
-from werkzeug.security import check_password_hash, generate_password_hash
-from models.user import UserModel
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
-jwt = JWTManager()
-
-
-def authenticate(email, password):
-    user = UserModel.objects(email=email).first()
-    if user and check_password_hash(user.password, password):
-        return user
+from models.user import UserSchema
+from sources.authentication.services import authenticate
 
 
-@jwt.user_loader_callback_loader
-def get_current_user(identity):
-    user = UserModel.objects(email=identity['email']).first()
-    return user
+class AuthenticationService:
+    def __init__(self):
+        self.schema = UserSchema()
+
+    def authenticate(self, email, password):
+        user = authenticate(email, password)
+        if user:
+            access_token = create_access_token(self.schema.dump(user))
+            return access_token
+
+    def get_current_user(self):
+        return get_jwt_identity()

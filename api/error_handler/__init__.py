@@ -39,6 +39,12 @@ def error_handler(logger: Logger):
                     "messages": ve.normalized_messages()
                 }
 
+            except FileNotFoundError as fn:
+                return {
+                           "status": "not_found",
+                           "error": fn.args[0]
+                       }, 404
+
             except Exception as e:
                 logger.error(
                     "Ocorreu um erro desconhecido no servidor",

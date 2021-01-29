@@ -1,15 +1,15 @@
-from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restplus import Namespace, Resource, Model, fields
 
 from api.error_handler import error_handler
-from api.request_models.data_management_api_models import datafile_model, delete_model, delete_response_model, \
+from api.request_models.data_management_models import datafile_model, delete_model, delete_response_model, \
     get_model, get_response_model, \
     post_model, post_response_model
 
 from models.datafile import DataFileSchema
 from sources.logger import create_logger
-from sources.datafile import import_data_file, list_all_user_data_files, delete_data_file
+from sources.datafile import DataFileService
+
 
 from mongoengine.errors import NotUniqueError
 from sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound, NotAuthorized
@@ -51,8 +51,9 @@ class DataManagementResource(Resource):
     @jwt_required
     def post(self):
         args = post_model.parse_args()
+        service = DataFileService()
         try:
-            datafile = import_data_file(**args)
+            datafile = service.import_datafile(**args)
             return {
                 'id': datafile.id
             }
@@ -95,8 +96,9 @@ class DataManagementResource(Resource):
     @jwt_required
     def get(self):
         args = get_model.parse_args()
+        service = DataFileService()
 
-        documents = list_all_user_data_files(**args)
+        documents = service.list_all_datafiles(**args)
 
         result = {
             "documents": self.schema.dump(documents, many=True),
@@ -111,19 +113,15 @@ class DataManagementResource(Resource):
     @jwt_required
     def delete(self):
         args = delete_model.parse_args()
+        service = DataFileService()
 
         try:
-            deleted = delete_data_file(**args)
+            deleted = service.delete_datafile(**args)
             return {
                 "deleted": deleted
             }
         except NotAuthorized:
             return {
                        "status": "not_authorized",
-                       "error": "Você não possui altorização para excluir esse arquivo"
+                       "error": "Você não possui autorização para excluir esse arquivo"
                    }, 403
-        except FileNotFoundError as fn:
-            return {
-                       "status": "not_found",
-                       "error": fn.args[0]
-                   }, 404

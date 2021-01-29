@@ -2,7 +2,7 @@ from flask import request
 from flask_restplus import Namespace, Resource, Model
 
 from api.error_handler import error_handler
-from api.request_models.user_api_models import post_model, post_response_model
+from api.request_models.user_models import post_model, post_response_model
 
 from sources.user import create_new_user
 from sources.logger import create_logger

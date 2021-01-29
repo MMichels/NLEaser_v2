@@ -21,8 +21,8 @@ class DataFileImportSchema(TaskSchema):
 
     @ma.pre_load()
     def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id)
-        data["datafile"] = str(data["datafile"].id)
+        data["owner"] = str(data["owner"].id) if data["owner"] else ""
+        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
         return data
 
     @ma.post_load()

@@ -14,4 +14,5 @@ class TextColumnNotFound(Exception):
 
 class NotAuthorized(Exception):
     # O usuário não tem permissão para realizar algum acesso/modificação
-    pass
+    def __init__(self, datafile_id):
+        super().__init__("Você não tem permissoes para acessar/modificar esse arquivo de dados")

@@ -44,12 +44,12 @@ post_model.add_argument(
 
 post_response_model = {
     "id": fields.String(
-        description="Hash de identificação dos dados."
+        description="Id unico do arquivo no banco de dados"
     )
 }
 post_response_model = make_response_model(post_response_model)
 
-###### GET MODELS
+###### GET MODELS ######
 get_model = reqparse.RequestParser()
 get_model.add_argument(
     "orderby",
@@ -68,34 +68,54 @@ get_model.add_argument(
     help="Ordernar os resultados de forma ascendente"
 )
 
-
 datafile_model = {
-    "id": fields.String(),
-    "name": fields.String(),
-    "language": fields.String(),
-    "text_column": fields.String(),
-    "created_at": fields.DateTime(),
+    "id": fields.String(
+        required=True,
+        description="É o ID unico que identifica esse arquivo no banco de dados"
+    ),
+    "name": fields.String(
+        required=True,
+        description="É o nome do arquivo enviado pelo usuário"
+    ),
+    "language": fields.String(
+        required=True,
+        description="É o idioma do arquivo informado pelo usuário, "
+                    "utilizado por alguns métodos de NLP durante as analises"
+    ),
+    "text_column": fields.String(
+        required=False,
+        default="txt",
+        description="Representa a coluna que contem as sentenças dentro do arquivo (csv, excel)"
+    ),
+    "created_at": fields.DateTime(
+        required=True,
+        description="É a data em que foi realizado o uploaad do arquivo"
+    ),
 }
 
 get_response_model = {
-    "total": fields.Integer()
+    "total": fields.Integer(
+        required=True,
+        description="Corresponde ao numero total de documentos que o usuário possui"
+    )
 }
 
 get_response_model = make_response_model(get_response_model)
 
-
 ##### DELETE MODELS
 delete_model = reqparse.RequestParser()
 delete_model.add_argument(
-    "id",
+    "datafile_id",
     required=True,
     location="args",
     type=str,
     help="Identificador do arquivo"
 )
 
-
 delete_response_model = {
-    "deleted": fields.Boolean()
+    "deleted": fields.Boolean(
+        required=True,
+        description="Confirma se o arquivo foi excluido ou não"
+    )
 }
 delete_response_model = make_response_model(delete_response_model)

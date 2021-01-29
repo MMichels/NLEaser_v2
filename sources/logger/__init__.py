@@ -45,7 +45,6 @@ class DBLogModel(Document):
             self.exceptionDetails = str(self.exceptionDetails)
 
 
-
 class DBLogHandler(logging.Handler):
     def __init__(self, level):
         return super().__init__(level)

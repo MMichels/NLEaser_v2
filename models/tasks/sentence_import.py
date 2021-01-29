@@ -20,9 +20,9 @@ class SentenceImportSchema(DataFileImportSchema):
 
     @ma.pre_load
     def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id)
-        data["datafile"] = str(data["datafile"].id)
-        data["parent"] = str(data["parent"].id)
+        data["owner"] = str(data["owner"].id) if data["owner"] else ""
+        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
+        data["parent"] = str(data["parent"].id) if data["parent"] else ""
         return data
 
     @ma.post_load()
