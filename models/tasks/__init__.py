@@ -23,7 +23,7 @@ class TaskModel(me.Document):
 
 
 class TaskSchema(ma.Schema):
-    owner = ma.fields.String(required=True)
+    owner = ma.fields.Nested(UserSchema, required=True)
     id = ma.fields.String(required=True, dump_only=True)
     created_at = ma.fields.DateTime(default=datetime.now)
     task_name = ma.fields.String(required=True)

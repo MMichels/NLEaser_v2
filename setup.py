@@ -28,5 +28,10 @@ RABBIT_QUEUES = {
         "exchange": "NLEaser",
         "queue": "sentence_import",
         "routing_key": "NLEaser.sentence_import"
+    },
+    "NLEaser.wordcloud_create": {
+        "exchange": "NLEaser",
+        "queue": "wordcloud_create",
+        "routing_key": "NLEaser.wordcloud_create"
     }
 }
