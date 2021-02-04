@@ -23,7 +23,7 @@ class TaskModel(me.Document):
 
 
 class TaskSchema(ma.Schema):
-    owner = ma.fields.Nested(UserSchema, required=True)
+    owner = ma.fields.String(required=True)
     id = ma.fields.String(required=True, dump_only=True)
     created_at = ma.fields.DateTime(default=datetime.now)
     task_name = ma.fields.String(required=True)
@@ -32,11 +32,6 @@ class TaskSchema(ma.Schema):
     error = ma.fields.String(required=False, default="")
     total = ma.fields.Integer(required=True)
     progress = ma.fields.Integer(required=False, default=0)
-
-    @ma.pre_load()
-    def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id)
-        return data
 
     @ma.post_load()
     def create_task(self, data, **kwargs):

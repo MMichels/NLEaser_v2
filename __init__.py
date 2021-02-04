@@ -7,7 +7,7 @@ from models import connect_db
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_pyfile("setup.py")
+    app.config.from_pyfile("nleaser_config/__init__.py")
     api.init_app(app)
     jwt.init_app(app)
     connect_db()

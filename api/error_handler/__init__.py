@@ -21,7 +21,7 @@ def error_handler(logger: Logger):
                 )
                 return {
                            "status": "bad_request",
-                           "error": "Ops, as informações que o servidor recebeu estão diferente do esperado\n" +
+                           "error": "Ops, as informações que o servidor recebeu estão diferente do esperado, " +
                                     "se o erro persistir contate o suporte",
                            "messages": e.data["errors"]
                        }, 400
@@ -34,7 +34,7 @@ def error_handler(logger: Logger):
                 )
                 return {
                     "status": "validation_error",
-                    "error": "Durante a validação das informações, alguns problemas ocorreram\n" +
+                    "error": "Durante a validação das informações, alguns problemas ocorreram, " +
                              "se o erro persistir contate o suporte",
                     "messages": ve.normalized_messages()
                 }
@@ -53,7 +53,7 @@ def error_handler(logger: Logger):
                 )
                 return {
                            "status": "error",
-                           "error": "Ops! parece que você encontrou uma falha...\n" +
+                           "error": "Ops! parece que você encontrou uma falha..." +
                                     "Se o erro persistir contate o suporte e iremos colocar o estagiário para resolver."
                        }, 500
 

@@ -5,7 +5,7 @@ from flask_jwt_extended import get_current_user
 from models.datafile import DataFileModel
 from sources.datafile.services import delete_data_file, get_datafile, import_data_file, list_all_user_datafiles
 from sources.sentences import SentencesService
-from sources.tasks.datafile_import_task import DataFileImportTaskService
+from sources.tasks.datafile.upload import DataFileUploadTaskService
 
 
 class DataFileService:
@@ -16,7 +16,7 @@ class DataFileService:
         imported_datafile = import_data_file(self.user, file, format, text_column,
                                              language, separador)
 
-        datafile_import_task_service = DataFileImportTaskService(
+        datafile_import_task_service = DataFileUploadTaskService(
             self.user, imported_datafile
         )
         datafile_import_task = datafile_import_task_service.create()

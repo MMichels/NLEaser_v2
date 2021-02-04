@@ -3,8 +3,8 @@ import json
 from mongoengine import NotUniqueError
 from pika.channel import Channel
 
-from models.tasks.datafile_import import DataFileImportModel
-from models.tasks.sentence_import import SentenceImportModel
+from models.tasks.datafile.upload import DataFileUploadTaskModel
+from models.tasks.sentence.save import SentenceSaveTaskModel
 from models.sentence import SentenceModel, SentenceSchema
 
 from sources.logger import create_logger
@@ -25,7 +25,7 @@ def preprocess_sentence(sentence: str, language: str) -> str:
     return p_sentence
 
 
-def process_task(sentences_import_task: SentenceImportModel) -> bool:
+def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
     # preprocessa a sentença
     try:
         preprocessed_sentence = preprocess_sentence(sentences_import_task.content,
@@ -80,7 +80,7 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
     try:
         task_info = json.loads(body.decode())
         logger.debug("Recuperando tarefa: " + task_info["task"])
-        sentences_import_task: SentenceImportModel = SentenceImportModel.objects(id=task_info["task"]).first()
+        sentences_import_task: SentenceSaveTaskModel = SentenceSaveTaskModel.objects(id=task_info["task"]).first()
         if sentences_import_task is None:
             raise Exception("Não foi encontrada nenhuma tarefa com o id " + task_info["task"])
 
@@ -96,7 +96,7 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
 
     datafile_import_task = sentences_import_task.parent
 
-    DataFileImportModel.objects(
+    DataFileUploadTaskModel.objects(
         id=datafile_import_task.id,
         progress__lt=datafile_import_task.total
     ).update_one(inc__progress=1)
@@ -112,7 +112,7 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
 
     datafile_import_task.reload("progress", "total")
     if datafile_import_task.progress >= datafile_import_task.total:
-        tasks_with_fail = SentenceImportModel.objects(
+        tasks_with_fail = SentenceSaveTaskModel.objects(
             parent=datafile_import_task,
             status="error"
         ).count()

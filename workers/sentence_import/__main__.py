@@ -1,6 +1,6 @@
 from models import connect_db
 from sources.logger import create_logger
-from . import sentence_preprocessor_consumer
+from workers.sentence_import import sentence_preprocessor_consumer
 
 logger = create_logger("sentence_import")
 

@@ -1,5 +1,5 @@
 from mongoengine import connect
-from setup import MONGO_HOST, MONGO_PORT, MONGO_DB
+from nleaser_config import MONGO_HOST, MONGO_PORT, MONGO_DB
 
 
 def connect_db():

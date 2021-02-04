@@ -3,7 +3,7 @@ from threading import Thread
 from sources.sentences.services import import_sentences_from_df
 
 
-class SentenceImportTaskService:
+class SentenceSaveTaskService:
 
     def __init__(self, user):
         self.user = user

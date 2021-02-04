@@ -1,15 +1,13 @@
 import json
 from typing import List, Union
 
-from flask_jwt_extended import get_current_user
 from pandas import DataFrame
 
 from models.datafile import DataFileModel
 from models.sentence import SentenceModel
-from models.tasks.datafile_import import DataFileImportModel
-from models.tasks.sentence_import import SentenceImportModel, SentenceImportSchema
+from models.tasks.datafile.upload import DataFileUploadTaskModel
+from models.tasks.sentence.save import SentenceSaveTaskModel, SentenceSaveTaskSchema
 
-from sources.datafile import get_datafile
 from sources.logger import create_logger
 from sources.rabbit.producer import RabbitProducer
 
@@ -17,7 +15,7 @@ logger = create_logger(__name__)
 
 
 def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
-                             datafile_import_task: DataFileImportModel) -> None:
+                             datafile_import_task: DataFileUploadTaskModel) -> None:
     logger.info("Importando sentenças", extra={"received_args": {
         "datafile": datafile.id
     }})
@@ -26,13 +24,13 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
     text_column = datafile.text_column
     try:
 
-        schema = SentenceImportSchema()
+        schema = SentenceSaveTaskSchema()
         producer = RabbitProducer("NLEaser.sentence_import")
         for index, row in df.iterrows():
-            sentence_import_task: SentenceImportModel = schema.load({
-                "owner": datafile.owner,
-                "datafile": datafile,
-                "parent": datafile_import_task,
+            sentence_import_task: SentenceSaveTaskModel = schema.load({
+                "owner": str(datafile.owner.id),
+                "datafile": str(datafile.id),
+                "parent": str(datafile_import_task.id),
                 "total": 1,
                 "content": row[text_column],
                 "index": index
@@ -50,13 +48,13 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
             exc_info=True,
             extra={"received_args": {
                 "datafile": datafile.id,
-                "datafile_import_task": datafile_import_task.id,
+                "upload": datafile_import_task.id,
                 "text_column": text_column
             }}
         )
 
 
-def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int) -> Union[List[SentenceImportModel], int]:
+def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int) -> Union[List[SentenceSaveTaskModel], int]:
     sentences = SentenceModel.objects(
         datafile=datafile,
         excluded=False

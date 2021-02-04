@@ -1,6 +1,6 @@
 import pika as pk
 
-from setup import RABBIT_HOST, RABBIT_PASS, RABBIT_PORT, RABBIT_QUEUES, RABBIT_USER
+from nleaser_config import RABBIT_HOST, RABBIT_PASS, RABBIT_PORT, RABBIT_QUEUES, RABBIT_USER
 
 
 class RabbitConector():

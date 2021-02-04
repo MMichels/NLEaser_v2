@@ -1,12 +1,12 @@
 import mongoengine as me
 import marshmallow as ma
 
-from models.datafile import DataFileModel
+from models.datafile import DataFileModel, DataFileSchema
 from models.tasks import TaskModel, TaskSchema
 from models.user import UserModel
 
 
-class DataFileImportModel(TaskModel):
+class DataFileUploadTaskModel(TaskModel):
     meta = {
         'allow_inheritance': True
     }
@@ -15,16 +15,10 @@ class DataFileImportModel(TaskModel):
     datafile: DataFileModel = me.fields.ReferenceField(DataFileModel, required=True)
 
 
-class DataFileImportSchema(TaskSchema):
+class DataFileUploadTaskSchema(TaskSchema):
     task_name = ma.fields.String(default="datafile_import")
     datafile = ma.fields.String(required=True)
 
-    @ma.pre_load()
-    def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id) if data["owner"] else ""
-        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
-        return data
-
     @ma.post_load()
     def create_task(self, data, **kwargs):
-        return DataFileImportModel(**data)
+        return DataFileUploadTaskModel(**data)
