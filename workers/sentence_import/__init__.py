@@ -1,4 +1,5 @@
 import json
+import logging
 
 from mongoengine import NotUniqueError
 from pika.channel import Channel
@@ -10,7 +11,7 @@ from models.sentence import SentenceModel, SentenceSchema
 from sources.logger import create_logger
 from sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers
 
-logger = create_logger("sentence_import")
+logger = logging.getLogger("sentence_import")
 
 
 def preprocess_sentence(sentence: str, language: str) -> str:

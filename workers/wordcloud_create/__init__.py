@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 from io import BytesIO
 from typing import List
 
@@ -10,7 +11,7 @@ from models.wordcloud import WordcloudModel, WordcloudSchema
 from sources.logger import create_logger
 from sources.nlp.tfidf.wordcloud import generate_wordcloud
 
-logger = create_logger("wordcloud_create")
+logger = logging.getLogger("wordcloud_create")
 
 
 def create_base64_wordcloud(sentences: List[SentenceModel], language: str) -> bytes:
