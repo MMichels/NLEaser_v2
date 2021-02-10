@@ -29,12 +29,19 @@ get_model.add_argument(
     help="id do arquivo de sentenças"
 )
 
-get_response_model = {
-    "wordcloud": fields.String(
+wordcloud_model = {
+    "base64_image": fields.String(
         required=True,
-        description="o wordcloud mais recente encodado em base64"
+        description="Imagem codificada em base64"
+    ),
+    "created_at": fields.DateTime(
+        required=True,
+        description="Data e hora em que o wordcloud foi criado"
     )
 }
+
+
+get_response_model = make_response_model({})
 
 ##### DELETE MODELS #####
 delete_model = reqparse.RequestParser()

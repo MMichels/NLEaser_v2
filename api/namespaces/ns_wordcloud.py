@@ -1,10 +1,10 @@
 from flask import request
 from flask_jwt_extended import jwt_required, get_current_user
-from flask_restplus import Namespace, Resource, Model, fields
+from flask_restplus import Namespace, Resource, fields
 
 from api.error_handler import error_handler
 from api.request_models.wordcloud_models import get_model, get_response_model, delete_model, delete_response_model, \
-    post_model, post_response_model, get_tasks_model, get_tasks_response_model, tasks_model
+    post_model, post_response_model, get_tasks_model, get_tasks_response_model, tasks_model, wordcloud_model
 
 from models.wordcloud import WordcloudSchema
 from models.tasks.wordcloud.create import WordcloudCreateTaskSchema
@@ -21,7 +21,13 @@ create_wordcloud_model = ns_wordcloud.model("create_wordcloud", post_model)
 create_wordcloud_response_model = ns_wordcloud.model("create_wordcloud_response_model", post_response_model)
 
 # GET
-get_wordclouds_response_model = ns_wordcloud.model("get_wordclouds_response_model", get_response_model)
+get_wordclouds_response_model = get_response_model.copy()
+get_wordclouds_response_model["wordcloud"] = fields.Nested(
+    ns_wordcloud.model("wordcloud_model", wordcloud_model),
+    as_list=True, required=False
+)
+get_wordclouds_response_model = ns_wordcloud.model("get_wordclouds_response_model", get_wordclouds_response_model)
+
 get_wc_tasks_response_model = get_tasks_response_model.copy()
 get_wc_tasks_response_model["tasks"] = fields.Nested(
     ns_wordcloud.model("tasks_model", tasks_model),
@@ -29,7 +35,7 @@ get_wc_tasks_response_model["tasks"] = fields.Nested(
 )
 
 
-get_wc_tasks_response_model = ns_wordcloud.model("get_wc_tasks_response_model", get_tasks_response_model)
+get_wc_tasks_response_model = ns_wordcloud.model("get_wc_tasks_response_model", get_wc_tasks_response_model)
 
 # DELETE
 delete_wordcloud_response_model = ns_wordcloud.model("delete_wordcloud_response_model", delete_response_model)
@@ -63,7 +69,7 @@ class WordcloudsResource(Resource):
         wc = service.get_wordcloud()
 
         return {
-            "wordcloud": self.wc_schema.dump(wc) if wc is not None else None
+            "wordcloud": self.wc_schema.dump(wc) if wc is not None else {}
         }
 
     @ns_wordcloud.expect(delete_model, validate=False)
