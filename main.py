@@ -1,7 +1,7 @@
-from __init__ import create_app
+from nleaser.api import create_api
 
 
 if __name__ == "__main__":
-    app = create_app()
+    app = create_api()
     app.run()
 

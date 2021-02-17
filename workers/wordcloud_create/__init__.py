@@ -4,12 +4,11 @@ import logging
 from io import BytesIO
 from typing import List
 
-from models.sentence import SentenceModel
-from models.tasks.wordcloud.create import WordcloudCreateTaskModel
-from models.wordcloud import WordcloudModel, WordcloudSchema
+from nleaser.models.sentence import SentenceModel
+from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
+from nleaser.models.wordcloud import WordcloudModel, WordcloudSchema
 
-from sources.logger import create_logger
-from sources.nlp.tfidf.wordcloud import generate_wordcloud
+from nleaser.sources.nlp.tfidf.wordcloud import generate_wordcloud
 
 logger = logging.getLogger("wordcloud_create")
 
