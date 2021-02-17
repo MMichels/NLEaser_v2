@@ -4,12 +4,11 @@ import logging
 from mongoengine import NotUniqueError
 from pika.channel import Channel
 
-from models.tasks.datafile.upload import DataFileUploadTaskModel
-from models.tasks.sentence.save import SentenceSaveTaskModel
-from models.sentence import SentenceModel, SentenceSchema
+from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel
+from nleaser.models.tasks.sentence.save import SentenceSaveTaskModel
+from nleaser.models.sentence import SentenceModel, SentenceSchema
 
-from sources.logger import create_logger
-from sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers
+from nleaser.sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers
 
 logger = logging.getLogger("sentence_import")
 
