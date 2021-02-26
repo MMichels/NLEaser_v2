@@ -1,18 +1,4 @@
-import os
-import sys
-import pathlib
-import ctypes
-
-directory = pathlib.Path(__file__).parent.absolute().joinpath("resources")
-filename = "cripto_debug" if os.getenv("ENV", None).lower().startswith("dev") else "cripto"
-
-if sys.platform == "win32":
-    lib = ctypes.WinDLL(str(directory.joinpath(filename+".dll")))
-else:
-    lib = ctypes.cdll.LoadLibrary(str(directory.joinpath(filename+".so")))
-
-lib.crypt.argtypes = lib.decrypt.argtypes = ctypes.c_char_p,
-lib.crypt.restype = lib.decrypt.restype = ctypes.c_char_p
+import safebox
 
 
 def crypt(message: str) -> str:
@@ -22,9 +8,8 @@ def crypt(message: str) -> str:
         message: string paara criptrografar
 
     Returns: string criptografada
-
     """
-    crypted_bts = lib.crypt(message.encode())
+    crypted_bts = safebox.crypt(message.encode())
     return crypted_bts.decode()
 
 
@@ -35,9 +20,8 @@ def decrypt(cipher: str) -> str:
         cipher: string criptografada
 
     Returns: string descriptografada
-
     """
-    decrypted_bts = lib.decrypt(cipher.encode())
+    decrypted_bts = safebox.decrypt(cipher.encode())
     return decrypted_bts.decode()
 
 
