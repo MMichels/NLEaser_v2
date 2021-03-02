@@ -104,8 +104,10 @@ class WordCloudsTaskResouce(Resource):
         service = WordcloudCreateTaskService(get_current_user())
         schema = WordcloudCreateTaskSchema()
         tasks = service.list_current_tasks(**args)
+        failed_tasks = service.list_failed_tasks(args["datafile_id"], tasks[tasks.count()-1].created_at)
         return {
             "tasks": schema.dump(tasks, many=True),
             "total": tasks.count(False),
-            "failed": tasks.filter(status="failed").count(False)
+            "failed": failed_tasks.count()
         }
+

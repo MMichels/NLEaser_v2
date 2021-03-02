@@ -15,14 +15,9 @@ class ConfigModel(me.Document):
     created_at = me.fields.DateTimeField(default=datetime.datetime.now)
     changed_at = me.fields.DateTimeField()
 
-    def __getitem__(self, item):
-        if item == 'value' and self.cripted:
-            return decrypt(self.value)
-        else:
-            return super().__getitem__(item)
-
+    @classmethod
     def _from_son(cls, son, _auto_dereference=True, only_fields=None, created=False):
-        obj: ConfigModel = super()._from_son()
+        obj: ConfigModel = super()._from_son(son, _auto_dereference, only_fields, created)
         if obj.cripted:
             obj.value = decrypt(obj.value)
 
@@ -69,4 +64,3 @@ if __name__ == '__main__':
         interromper = input("Continuar? (s/n)").lower()[0] == 'n'
         if interromper:
             break
-

@@ -11,6 +11,7 @@ class UserModel(me.Document):
     password = me.fields.StringField(required=True)
     name = me.fields.StringField(max_length=150, required=True)
     created_at = me.fields.DateTimeField(default=datetime.datetime.now)
+    cipher_password = me.fields.BinaryField(required=True)
 
 
 class UserSchema(ma.Schema):

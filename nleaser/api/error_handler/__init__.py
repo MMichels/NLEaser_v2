@@ -2,6 +2,7 @@ from functools import wraps
 from logging import Logger
 
 from flask import request
+from jwt import ExpiredSignatureError, InvalidSignatureError
 from werkzeug.exceptions import BadRequest
 from marshmallow.exceptions import ValidationError
 
@@ -45,6 +46,18 @@ def error_handler(logger: Logger):
                            "error": fn.args[0]
                        }, 404
 
+            except (ExpiredSignatureError, InvalidSignatureError) as es:
+                logger.error(
+                    "Tentativa de acesso com um token inválido",
+                    exc_info=True,
+                    extra={
+                        "received_args": request
+                    }
+                )
+                return {
+                    "status": "error",
+                    "error": "Ops! Você precisa realizar seu login novamente!"
+                }, 403
             except Exception as e:
                 logger.error(
                     "Ocorreu um erro desconhecido no servidor",
@@ -53,7 +66,7 @@ def error_handler(logger: Logger):
                 )
                 return {
                            "status": "error",
-                           "error": "Ops! parece que você encontrou uma falha..." +
+                           "error": "Ops! parece que você encontrou uma falha seria aqui... " +
                                     "Se o erro persistir contate o suporte e iremos colocar o estagiário para resolver."
                        }, 500
 

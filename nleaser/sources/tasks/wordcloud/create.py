@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 from mongoengine import QuerySet
 
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel, WordcloudCreateTaskSchema
@@ -34,3 +34,10 @@ class WordcloudCreateTaskService:
             owner=self.user, datafile=datafile_id
         ).order_by("-created_at").limit(5)
         return tasks
+
+    def list_failed_tasks(self, datafile_id: str, dataInicial: datetime):
+        failed_tasks = WordcloudCreateTaskModel.objects(
+            owner=self.user, datafile=datafile_id,
+            created_at__gte=dataInicial, status="error"
+        ).order_by("-created_at")
+        return failed_tasks

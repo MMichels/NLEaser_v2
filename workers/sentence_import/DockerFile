@@ -1,8 +1,13 @@
 FROM python:3.6
 
-COPY ./dist/sentence_import_worker_NLEaser-0.4.0-py2.py3-none-any.whl .
-
 RUN apt-get update
+
+ADD ./resources/safebox-nleaser.tar.gz .
+COPY ./workers/sentence_import/dist/sentence_import_worker_NLEaser-0.4.0-py2.py3-none-any.whl .
+
+RUN pip3 install ./safebox-nleaser.tar.gz
+RUN rm safebox-nleaser.tar.gz
+
 #RUN pip3 install sentence-import-worker-NLEaser
 RUN pip3 install sentence_import_worker_NLEaser-0.4.0-py2.py3-none-any.whl
 

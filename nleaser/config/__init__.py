@@ -1,5 +1,5 @@
 import os
-from .secure import decrypt
+from nleaser.config.secure import decrypt
 
 # CONFIGS FLASK
 DEBUG = True

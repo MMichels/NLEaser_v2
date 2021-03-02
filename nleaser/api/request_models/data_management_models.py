@@ -50,24 +50,6 @@ post_response_model = {
 post_response_model = make_response_model(post_response_model)
 
 ###### GET MODELS ######
-get_model = reqparse.RequestParser()
-get_model.add_argument(
-    "orderby",
-    required=True,
-    location="args",
-    type=str,
-    help="Campo utilizado para ordernar a lista de resultados",
-    choices=["name", "created_at"],
-)
-get_model.add_argument(
-    "order_ascending",
-    default=True,
-    required=False,
-    location="args",
-    type=bool,
-    help="Ordernar os resultados de forma ascendente"
-)
-
 datafile_model = {
     "id": fields.String(
         required=True,
@@ -93,25 +75,36 @@ datafile_model = {
     ),
 }
 
-get_response_model = {
+get_response_model = make_response_model(datafile_model)
+
+get_list_model = reqparse.RequestParser()
+get_list_model.add_argument(
+    "orderby",
+    required=True,
+    location="args",
+    type=str,
+    help="Campo utilizado para ordernar a lista de resultados",
+    choices=["name", "created_at"],
+)
+get_list_model.add_argument(
+    "order_ascending",
+    default=True,
+    required=False,
+    location="args",
+    type=bool,
+    help="Ordernar os resultados de forma ascendente"
+)
+
+list_datafile_response_model = {
     "total": fields.Integer(
         required=True,
         description="Corresponde ao numero total de documentos que o usuário possui"
     )
 }
 
-get_response_model = make_response_model(get_response_model)
+list_datafile_response_model = make_response_model(list_datafile_response_model)
 
 ##### DELETE MODELS
-delete_model = reqparse.RequestParser()
-delete_model.add_argument(
-    "datafile_id",
-    required=True,
-    location="args",
-    type=str,
-    help="Identificador do arquivo"
-)
-
 delete_response_model = {
     "deleted": fields.Boolean(
         required=True,

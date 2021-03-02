@@ -1,19 +1,23 @@
 import pika as pk
 
-from nleaser.config import RABBIT_HOST, RABBIT_PASS, RABBIT_PORT, RABBIT_QUEUES, RABBIT_USER
+from nleaser.config import RABBIT_HOST
+from nleaser.models.config import ConfigModel
+from nleaser.models.config.rabbit_queues import RabbitQueueConfigModel
 
 
 class RabbitConector():
     rabbit_host = RABBIT_HOST
-    rabbit_port = RABBIT_PORT
-    rabbit_user = RABBIT_USER
-    rabbit_pass = RABBIT_PASS
     channel: pk.adapters.blocking_connection.BlockingChannel = None
 
     def __init__(self, queue_name):
-        self.exchange = RABBIT_QUEUES[queue_name]["exchange"]
-        self.routing_key = RABBIT_QUEUES[queue_name]["routing_key"]
-        self.queue = RABBIT_QUEUES[queue_name]["queue"]
+        self.rabbit_port = ConfigModel.objects(name="RABBIT_PORT").first().value
+        self.rabbit_user = ConfigModel.objects(name="RABBIT_USER").first().value
+        self.rabbit_pass = ConfigModel.objects(name="RABBIT_PASS").first().value
+
+        rabbit_queue: RabbitQueueConfigModel = RabbitQueueConfigModel.objects(name=queue_name).first()
+        self.exchange = rabbit_queue.value.exchange
+        self.routing_key = rabbit_queue.value.routing_key
+        self.queue = rabbit_queue.value.queue
 
     def connect(self):
         creds = pk.PlainCredentials(

@@ -10,6 +10,7 @@ from nleaser.models.tasks.sentence.save import SentenceSaveTaskModel, SentenceSa
 
 from nleaser.sources.logger import create_logger
 from nleaser.sources.rabbit.producer import RabbitProducer
+from nleaser.sources.secure import load_cipher
 
 logger = create_logger(__name__)
 
@@ -19,6 +20,10 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
     logger.info("Importando sentenças", extra={"received_args": {
         "datafile": datafile.id
     }})
+
+    user = datafile.owner
+    cipher = load_cipher(user)
+
     datafile_import_task.status = "in_progress"
     datafile_import_task.save()
     text_column = datafile.text_column
@@ -32,7 +37,7 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
                 "datafile": str(datafile.id),
                 "parent": str(datafile_import_task.id),
                 "total": 1,
-                "content": row[text_column],
+                "content": cipher.encrypt(row[text_column].encode()).decode(),
                 "index": index
             })
             sentence_import_task.save()
@@ -61,6 +66,10 @@ def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int)
     )
     total = sentences.count()
     sentences_pag = sentences.skip(skip).limit(limit)
+    cipher = load_cipher(datafile.owner)
+    for s in sentences_pag:
+        s.content = cipher.decrypt(s.content.encode()).decode()
+        s.pre_processed_content = cipher.decrypt(s.pre_processed_content.encode()).decode()
 
     return sentences_pag, total
 

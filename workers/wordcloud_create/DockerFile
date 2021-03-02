@@ -1,6 +1,13 @@
 FROM python:3.6
 
 RUN apt-get update
+
+
+COPY ../../resources/safebox-nleaser.tar.gz .
+
+RUN pip3 install safebox-nleaser.tar.gz
+RUN rm safebox-nleaser.tar.gz
+
 RUN pip3 install wordcloud-create-worker-NLEaser
 
 ENV ENV=development

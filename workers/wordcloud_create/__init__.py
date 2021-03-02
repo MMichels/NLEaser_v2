@@ -4,17 +4,20 @@ import logging
 from io import BytesIO
 from typing import List
 
+from nleaser.models.user import UserModel
 from nleaser.models.sentence import SentenceModel
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
 from nleaser.models.wordcloud import WordcloudModel, WordcloudSchema
 
 from nleaser.sources.nlp.tfidf.wordcloud import generate_wordcloud
+from nleaser.sources.secure import load_cipher
 
 logger = logging.getLogger("wordcloud_create")
 
 
-def create_base64_wordcloud(sentences: List[SentenceModel], language: str) -> bytes:
-    pre_processed_sentences = [sentence.pre_processed_content for sentence in sentences]
+def create_base64_wordcloud(user: UserModel, sentences: List[SentenceModel], language: str) -> bytes:
+    cipher = load_cipher(user)
+    pre_processed_sentences = [cipher.decrypt(sentence.pre_processed_content.encode()).decode() for sentence in sentences]
     wordcloud = generate_wordcloud(pre_processed_sentences, language)
     image = wordcloud.to_image()
     buffer = BytesIO()
@@ -47,6 +50,7 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
 
     try:
         base64_image = create_base64_wordcloud(
+            wordcloud_create_task.owner,
             sentences,
             wordcloud_create_task.datafile.language
         )
@@ -64,10 +68,11 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
     # Salva o wc
 
     try:
+        cipher = load_cipher(wordcloud_create_task.owner)
         schema = WordcloudSchema()
         model: WordcloudModel = schema.load({
             "datafile": wordcloud_create_task.datafile,
-            "base64_image": base64_image
+            "base64_image": cipher.encrypt(base64_image).decode()
         })
         model.save()
     except Exception as e:

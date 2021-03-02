@@ -2,9 +2,8 @@ from flask_jwt_extended import jwt_required
 from flask_restplus import Namespace, Resource, Model, fields
 
 from nleaser.api.error_handler import error_handler
-from nleaser.api.request_models.data_management_models import datafile_model, delete_model, delete_response_model, \
-    get_model, get_response_model, \
-    post_model, post_response_model
+from nleaser.api.request_models.data_management_models import datafile_model, delete_response_model, \
+    get_list_model, get_response_model, list_datafile_response_model, post_model, post_response_model
 
 from nleaser.models.datafile import DataFileSchema
 from nleaser.sources.logger import create_logger
@@ -25,10 +24,11 @@ ns_data_management = Namespace(
 upload_response_model: Model = ns_data_management.model("upload_response_model", post_response_model)
 
 # GET
+get_datafile_response_model: Model = ns_data_management.model("get_datafile_response_model", get_response_model, mask=None)
 
-list_datafiles_response_model = get_response_model.copy()
+list_datafiles_response_model = list_datafile_response_model.copy()
 list_datafiles_response_model["documents"] = fields.Nested(
-    ns_data_management.model("datafile_model", datafile_model, mask=None),
+    ns_data_management.model("datafile_response_model", datafile_model, mask=None),
     as_list=True, mask=None
 )
 
@@ -50,6 +50,9 @@ class DataManagementResource(Resource):
     @error_handler(logger)
     @jwt_required
     def post(self):
+        """
+        Realiza o upload de um novo arquivo.
+        """
         args = post_model.parse_args()
         service = DataFileService()
         try:
@@ -90,12 +93,15 @@ class DataManagementResource(Resource):
                                 "converta seu arquivo para um dos formatos suportados e tente novamente."
                    }, 415
 
-    @ns_data_management.expect(get_model, validate=False)
+    @ns_data_management.expect(get_list_model, validate=False)
     @ns_data_management.marshal_with(list_datafiles_response_model)
     @error_handler(logger)
     @jwt_required
     def get(self):
-        args = get_model.parse_args()
+        """
+        Retorna a lista de arquivos desse usuario
+        """
+        args = get_list_model.parse_args()
         service = DataFileService()
 
         documents = service.list_all_datafiles(**args)
@@ -107,16 +113,33 @@ class DataManagementResource(Resource):
 
         return result
 
-    @ns_data_management.expect(delete_model, validate=False)
+
+@ns_data_management.route("/<string:datafile_id>")
+class DataManagementSingleResource(Resource):
+    schema = DataFileSchema()
+
+    @ns_data_management.marshal_with(get_datafile_response_model)
+    @error_handler(logger)
+    @jwt_required
+    def get(self, datafile_id):
+        """
+        Retorna as informações de apenas 1 arquivo
+        Args:
+            datafile_id: id do arquivo que vc deseja obter
+        """
+
+        service = DataFileService()
+        document = service.get_datafile(datafile_id)
+        return self.schema.dump(document)
+
     @ns_data_management.marshal_with(delete_datafile_response_model)
     @error_handler(logger)
     @jwt_required
-    def delete(self):
-        args = delete_model.parse_args()
+    def delete(self, datafile_id):
         service = DataFileService()
 
         try:
-            deleted = service.delete_datafile(**args)
+            deleted = service.delete_datafile(datafile_id)
             return {
                 "deleted": deleted
             }
@@ -125,3 +148,4 @@ class DataManagementResource(Resource):
                        "status": "not_authorized",
                        "error": "Você não possui autorização para excluir esse arquivo"
                    }, 403
+

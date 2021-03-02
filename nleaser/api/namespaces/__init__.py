@@ -5,19 +5,21 @@ from .ns_data_management import ns_data_management
 from .ns_sentences import ns_sentences
 from .ns_wordcloud import ns_wordcloud
 
-api = Api(
-    title="NLEaser",
-    description="Aplicação voltada a facilitar o acesso a recursos de NLP"
-)
-
-api.authorizations = {
-    "apiKey": {
-        "type": 'apiKey',
-        "in": "header",
-        "name": "Authorization"
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
     }
 }
-api.security = "apiKey"
+
+api = Api(
+    title="NLEaser",
+    description="Aplicação voltada a facilitar o acesso a recursos de NLP",
+    authorizations=authorizations,
+    security="apikey"
+)
+
 api.add_namespace(ns_users, path="/user")
 api.add_namespace(ns_authentication, path="/login")
 api.add_namespace(ns_data_management, path="/datafile")

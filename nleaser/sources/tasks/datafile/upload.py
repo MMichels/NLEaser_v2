@@ -11,7 +11,7 @@ class DataFileUploadTaskService:
     def create(self):
         datafile_import_task: DataFileUploadTaskModel = self.datafile_import_schema.load({
             "owner": str(self.user.id),
-            "total": self.imported_datafile["df"].shape[1],
+            "total": self.imported_datafile["df"].shape[0],
             "datafile": str(self.imported_datafile["datafile"].id)
         })
         datafile_import_task.save()

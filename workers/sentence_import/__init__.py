@@ -7,6 +7,7 @@ from pika.channel import Channel
 from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel
 from nleaser.models.tasks.sentence.save import SentenceSaveTaskModel
 from nleaser.models.sentence import SentenceModel, SentenceSchema
+from nleaser.sources.secure import load_cipher
 
 from nleaser.sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers
 
@@ -27,9 +28,14 @@ def preprocess_sentence(sentence: str, language: str) -> str:
 
 def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
     # preprocessa a sentença
+    cipher = load_cipher(sentences_import_task.owner)
+
+
     try:
-        preprocessed_sentence = preprocess_sentence(sentences_import_task.content,
-                                                    sentences_import_task.datafile.language)
+        preprocessed_sentence = preprocess_sentence(
+            cipher.decrypt(sentences_import_task.content.encode()).decode(),
+            sentences_import_task.datafile.language
+        )
 
     except Exception as e:
         sentences_import_task.status = "error"
@@ -49,7 +55,7 @@ def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
             "datafile": sentences_import_task.datafile,
             "index": sentences_import_task.index,
             "content": sentences_import_task.content,
-            "pre_processed_content": preprocessed_sentence
+            "pre_processed_content": cipher.encrypt(preprocessed_sentence.encode()).decode()
         })
         sentence.save()
     except NotUniqueError:
