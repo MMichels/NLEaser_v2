@@ -9,7 +9,7 @@ from nleaser.sources.secure import load_cipher
 
 
 class WordcloudService:
-    def __init__(self, datafile_id: int = None):
+    def __init__(self, datafile_id: str = None):
         self.user = get_current_user()
 
         if datafile_id:
@@ -28,7 +28,9 @@ class WordcloudService:
         wc: WordcloudModel = wcs.first()
         if wc:
             wc.base64_image = private_cipher.decrypt(wc.base64_image.encode()).decode()
-        return wc
+            return wc
+        else:
+            raise FileNotFoundError("Ainda não existe nenhum wordcloud para esse conjunto de dados")
 
     def delete_wordcloud(self) -> bool:
         deleted = delete_wordclouds_from_datafile(self.datafile)

@@ -126,4 +126,7 @@ def wordcloud_create_consumer(ch, method, properties, body):
             requeue=False
         )
 
+
+    logger.debug("Finalizando tarefa: " + task_info["task"])
+
     return True

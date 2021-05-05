@@ -33,6 +33,10 @@ class WordcloudCreateTaskService:
         tasks = WordcloudCreateTaskModel.objects(
             owner=self.user, datafile=datafile_id
         ).order_by("-created_at").limit(5)
+
+        if tasks.count() == 0:
+            raise FileNotFoundError("Não existe nenhuma tarefa em progresso")
+
         return tasks
 
     def list_failed_tasks(self, datafile_id: str, dataInicial: datetime):
@@ -40,4 +44,5 @@ class WordcloudCreateTaskService:
             owner=self.user, datafile=datafile_id,
             created_at__gte=dataInicial, status="error"
         ).order_by("-created_at")
+
         return failed_tasks

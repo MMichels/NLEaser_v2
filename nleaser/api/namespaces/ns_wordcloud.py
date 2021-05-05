@@ -3,8 +3,8 @@ from flask_jwt_extended import jwt_required, get_current_user
 from flask_restplus import Namespace, Resource, fields
 
 from nleaser.api.error_handler import error_handler
-from nleaser.api.request_models.wordcloud_models import get_model, get_response_model, delete_model, delete_response_model, \
-    post_model, post_response_model, get_tasks_model, get_tasks_response_model, tasks_model, wordcloud_model
+from nleaser.api.request_models.wordcloud_models import get_response_model, delete_response_model, \
+    post_response_model, get_tasks_response_model, tasks_model
 
 from nleaser.models.wordcloud import WordcloudSchema
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskSchema
@@ -17,16 +17,10 @@ logger = create_logger(__name__)
 ns_wordcloud = Namespace("Wordcloud", "Namespace para criar, verificar e excluir wordclouds")
 
 # POST
-create_wordcloud_model = ns_wordcloud.model("create_wordcloud", post_model)
 create_wordcloud_response_model = ns_wordcloud.model("create_wordcloud_response_model", post_response_model)
 
 # GET
-get_wordclouds_response_model = get_response_model.copy()
-get_wordclouds_response_model["wordcloud"] = fields.Nested(
-    ns_wordcloud.model("wordcloud_model", wordcloud_model),
-    as_list=True, required=False
-)
-get_wordclouds_response_model = ns_wordcloud.model("get_wordclouds_response_model", get_wordclouds_response_model)
+get_wordclouds_response_model = ns_wordcloud.model("get_wordcloud_response_model", get_response_model)
 
 get_wc_tasks_response_model = get_tasks_response_model.copy()
 get_wc_tasks_response_model["tasks"] = fields.Nested(
@@ -41,44 +35,43 @@ get_wc_tasks_response_model = ns_wordcloud.model("get_wc_tasks_response_model", 
 delete_wordcloud_response_model = ns_wordcloud.model("delete_wordcloud_response_model", delete_response_model)
 
 
-@ns_wordcloud.route("")
+@ns_wordcloud.route("/<string:datafile_id>", methods=["POST", "GET", "DELETE"])
 class WordcloudsResource(Resource):
     wc_schema = WordcloudSchema()
 
-    @ns_wordcloud.expect(create_wordcloud_model, validate=False)
     @ns_wordcloud.marshal_with(create_wordcloud_response_model, code=201)
     @error_handler(logger)
     @jwt_required
-    def post(self):
-        args = request.get_json()
-        create_wordcloud_model.validate(args)
-        service = WordcloudService(**args)
+    def post(self, datafile_id):
+        """
+            Cria um novo Wordcloud
+        """
+        service = WordcloudService(datafile_id)
 
         create_wc_task = service.create_wordcloud()
         return {
             "create_wc_task_id": create_wc_task.id
         }
 
-    @ns_wordcloud.expect(get_model, validate=False)
     @ns_wordcloud.marshal_with(get_wordclouds_response_model)
     @error_handler(logger)
     @jwt_required
-    def get(self):
-        args = get_model.parse_args()
-        service = WordcloudService(**args)
+    def get(self, datafile_id):
+        """
+            Recupera o ultimo Wordcloud criado
+        """
+        service = WordcloudService(datafile_id)
         wc = service.get_wordcloud()
+        return self.wc_schema.dump(wc)
 
-        return {
-            "wordcloud": self.wc_schema.dump(wc) if wc is not None else {}
-        }
-
-    @ns_wordcloud.expect(delete_model, validate=False)
     @ns_wordcloud.marshal_with(delete_wordcloud_response_model)
     @error_handler(logger)
     @jwt_required
-    def delete(self):
-        args = delete_model.parse_args()
-        service = WordcloudService(**args)
+    def delete(self, datafile_id):
+        """
+            Exclui um wordcloud
+        """
+        service = WordcloudService(datafile_id)
         deleted = service.delete_wordcloud()
 
         return {
@@ -86,28 +79,26 @@ class WordcloudsResource(Resource):
         }
 
 
-
-@ns_wordcloud.route("/tasks", methods=["GET"])
+@ns_wordcloud.route("/<string:datafile_id>/tasks", methods=["GET"])
 class WordCloudsTaskResouce(Resource):
+    schema = WordcloudCreateTaskSchema()
 
-    @ns_wordcloud.expect(get_tasks_model, validate=False)
     @ns_wordcloud.marshal_with(get_wc_tasks_response_model)
     @error_handler(logger)
     @jwt_required
-    def get(self):
+    def get(self, datafile_id):
         """
-        Verifica todas as requisições para criação de wordclouds que estão em progresso
-        :param datafile_id: id do arquivo de dados
-        :return: List[WordCloudCreateTask]
+            Verifica todas as requisições para criação de wordclouds que estão em progresso
         """
-        args = get_tasks_model.parse_args()
         service = WordcloudCreateTaskService(get_current_user())
-        schema = WordcloudCreateTaskSchema()
-        tasks = service.list_current_tasks(**args)
-        failed_tasks = service.list_failed_tasks(args["datafile_id"], tasks[tasks.count()-1].created_at)
-        return {
-            "tasks": schema.dump(tasks, many=True),
-            "total": tasks.count(False),
-            "failed": failed_tasks.count()
-        }
+        tasks = service.list_current_tasks(datafile_id)
+
+        if tasks.count() > 0:
+            failed_tasks = service.list_failed_tasks(datafile_id, tasks[tasks.count()-1].created_at)
+            return {
+                "tasks": self.schema.dump(tasks, many=True),
+                "total": tasks.count(False),
+                "failed": failed_tasks.count()
+            }
+
 

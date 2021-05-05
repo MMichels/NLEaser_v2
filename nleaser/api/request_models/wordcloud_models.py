@@ -20,15 +20,6 @@ post_response_model = {
 post_response_model = make_response_model(post_response_model)
 
 ##### GET MODELS #####
-get_model = reqparse.RequestParser()
-get_model.add_argument(
-    "datafile_id",
-    required=True,
-    location="args",
-    type=str,
-    help="id do arquivo de sentenças"
-)
-
 wordcloud_model = {
     "base64_image": fields.String(
         required=True,
@@ -39,21 +30,9 @@ wordcloud_model = {
         description="Data e hora em que o wordcloud foi criado"
     )
 }
-
-
-get_response_model = make_response_model({})
+get_response_model = make_response_model(wordcloud_model)
 
 ##### DELETE MODELS #####
-delete_model = reqparse.RequestParser()
-delete_model.add_argument(
-    "datafile_id",
-    required=True,
-    location="args",
-    type=str,
-    help="id do arquivo de sentenças"
-)
-
-
 delete_response_model = {
     "deleted": fields.Boolean(
         required=True,
@@ -63,15 +42,6 @@ delete_response_model = {
 delete_response_model = make_response_model(delete_response_model)
 
 ##### TASKS MODELS #####
-get_tasks_model = reqparse.RequestParser()
-get_tasks_model.add_argument(
-    "datafile_id",
-    required=True,
-    location="args",
-    type=str,
-    help="id do arquivo de sentenças"
-)
-
 get_tasks_response_model = {
     "total": fields.Integer(
         required=True,
@@ -96,6 +66,14 @@ tasks_model = {
     "status": fields.String(
         required=True,
         decription="Status da task"
+    ),
+    "total": fields.Integer(
+        required=True,
+        description="Total de passos necessários para concluir a tarefa"
+    ),
+    "progress": fields.Integer(
+        required=True,
+        description="Passo atual da tarefa"
     ),
     "error": fields.String(
         required=False,
