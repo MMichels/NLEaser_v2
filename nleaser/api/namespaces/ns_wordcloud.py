@@ -1,10 +1,10 @@
-from flask import request
 from flask_jwt_extended import jwt_required, get_current_user
 from flask_restplus import Namespace, Resource, fields
 
 from nleaser.api.error_handler import error_handler
-from nleaser.api.request_models.wordcloud_models import get_response_model, delete_response_model, \
-    post_response_model, get_tasks_response_model, tasks_model
+from nleaser.api.request_models import tasks_model, get_tasks_response_model
+from nleaser.api.request_models.wordcloud_models import get_response_model, \
+    delete_response_model, post_response_model
 
 from nleaser.models.wordcloud import WordcloudSchema
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskSchema
@@ -22,17 +22,16 @@ create_wordcloud_response_model = ns_wordcloud.model("create_wordcloud_response_
 # GET
 get_wordclouds_response_model = ns_wordcloud.model("get_wordcloud_response_model", get_response_model)
 
+# DELETE
+delete_wordcloud_response_model = ns_wordcloud.model("delete_wordcloud_response_model", delete_response_model)
+
+# TASKS
 get_wc_tasks_response_model = get_tasks_response_model.copy()
 get_wc_tasks_response_model["tasks"] = fields.Nested(
     ns_wordcloud.model("tasks_model", tasks_model),
     as_list=True
 )
-
-
 get_wc_tasks_response_model = ns_wordcloud.model("get_wc_tasks_response_model", get_wc_tasks_response_model)
-
-# DELETE
-delete_wordcloud_response_model = ns_wordcloud.model("delete_wordcloud_response_model", delete_response_model)
 
 
 @ns_wordcloud.route("/<string:datafile_id>", methods=["POST", "GET", "DELETE"])

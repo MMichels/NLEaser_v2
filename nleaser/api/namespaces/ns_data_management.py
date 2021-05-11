@@ -1,17 +1,20 @@
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_current_user
 from flask_restplus import Namespace, Resource, Model, fields
 
 from nleaser.api.error_handler import error_handler
+from nleaser.api.request_models import tasks_model, get_tasks_response_model
 from nleaser.api.request_models.data_management_models import datafile_model, delete_response_model, \
     get_list_model, get_response_model, list_datafile_response_model, post_model, post_response_model
 
 from nleaser.models.datafile import DataFileSchema
+from nleaser.models.tasks.datafile.upload import DataFileUploadTaskSchema
 from nleaser.sources.logger import create_logger
 from nleaser.sources.datafile import DataFileService
 
 
 from mongoengine.errors import NotUniqueError
 from nleaser.sources.datafile.exceptions import InvalidFormatException, FileReadException, TextColumnNotFound, NotAuthorized
+from nleaser.sources.tasks.datafile.upload import DataFileUploadTaskService
 
 logger = create_logger(__name__)
 
@@ -39,6 +42,15 @@ list_datafiles_response_model: Model = ns_data_management.model(name="list_dataf
 # DELETE
 delete_datafile_response_model: Model = ns_data_management.model("delete_datafile_response_model",
                                                                  delete_response_model)
+
+# TASKS
+get_df_tasks_response_model = get_tasks_response_model.copy()
+get_df_tasks_response_model["tasks"] = fields.Nested(
+    ns_data_management.model("task_model", tasks_model), as_list=True
+)
+get_df_tasks_response_model = ns_data_management.model(
+    "get_df_tasks_response_model", get_df_tasks_response_model
+)
 
 
 @ns_data_management.route("")
@@ -136,6 +148,9 @@ class DataManagementSingleResource(Resource):
     @error_handler(logger)
     @jwt_required
     def delete(self, datafile_id):
+        """
+        Exclui o arquivo
+        """
         service = DataFileService()
 
         try:
@@ -149,3 +164,25 @@ class DataManagementSingleResource(Resource):
                        "error": "Você não possui autorização para excluir esse arquivo"
                    }, 403
 
+
+@ns_data_management.route("/<string:datafile_id>/tasks")
+class DataManagementTaskResource(Resource):
+    schema = DataFileUploadTaskSchema()
+
+    @ns_data_management.marshal_with(get_df_tasks_response_model)
+    @error_handler(logger)
+    @jwt_required
+    def get(self, datafile_id):
+        """
+        Retorna a as tarefas de upload relacionadas a esse arquivo (progresso do upload)
+        """
+        service = DataFileUploadTaskService(get_current_user())
+        tasks = service.list_current_tasks(datafile_id)
+
+        if tasks.count() > 0:
+            failed_tasks = service.list_failed_tasks(datafile_id, tasks[tasks.count()-1].created_at)
+            return {
+                "tasks": self.schema.dump(tasks, many=True),
+                "total": tasks.count(False),
+                "failed": failed_tasks.count()
+            }

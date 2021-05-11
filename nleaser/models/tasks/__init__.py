@@ -6,10 +6,17 @@ import marshmallow as ma
 from nleaser.models.user import UserModel
 
 
+class TasksQuerySet(me.QuerySet):
+    def __init__(self, document, collection):
+        super().__init__(document, collection)
+        self.no_sub_classes()
+
+
 class TaskModel(me.Document):
     meta = {
         'collection': 'task',
-        'allow_inheritance': True
+        'allow_inheritance': True,
+        'queryset_class': TasksQuerySet
     }
 
     owner = me.fields.ReferenceField(UserModel, required=True)

@@ -102,6 +102,10 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
 
     datafile_import_task = sentences_import_task.parent
 
+    if datafile_import_task.status == "queued":
+        datafile_import_task.status == "in_progress"
+        datafile_import_task.save()
+
     DataFileUploadTaskModel.objects(
         id=datafile_import_task.id,
         progress__lt=datafile_import_task.total

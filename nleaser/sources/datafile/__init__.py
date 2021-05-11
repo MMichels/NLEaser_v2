@@ -17,9 +17,9 @@ class DataFileService:
                                              language, separador)
 
         datafile_import_task_service = DataFileUploadTaskService(
-            self.user, imported_datafile
+            self.user
         )
-        datafile_import_task = datafile_import_task_service.create()
+        datafile_import_task = datafile_import_task_service.create(imported_datafile)
 
         sentence_service = SentencesService(imported_datafile["datafile"])
 
