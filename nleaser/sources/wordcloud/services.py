@@ -6,13 +6,13 @@ from nleaser.models.wordcloud import WordcloudModel
 
 def get_wordclouds_from_datafile(datafile: DataFileModel) -> QuerySet:
     wcs = WordcloudModel.objects(
-        datafile=datafile, excluded=False
+        datafile=datafile
     ).order_by("-created_at")
     return wcs
 
 
 def delete_wordclouds_from_datafile(datafile: DataFileModel) -> bool:
     deleted = WordcloudModel.objects(
-        datafile=datafile, excluded=False
-    ).update(set__excluded=True)
+        datafile=datafile
+    ).delete()
     return deleted > 0

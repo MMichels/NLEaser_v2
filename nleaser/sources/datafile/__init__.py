@@ -6,6 +6,7 @@ from nleaser.models.datafile import DataFileModel
 from nleaser.sources.datafile.services import delete_data_file, get_datafile, import_data_file, list_all_user_datafiles
 from nleaser.sources.sentences import SentencesService
 from nleaser.sources.tasks.datafile.upload import DataFileUploadTaskService
+from nleaser.sources.wordcloud import WordcloudService
 
 
 class DataFileService:
@@ -40,8 +41,13 @@ class DataFileService:
     def delete_datafile(self, datafile_id: str) -> bool:
         deleted = delete_data_file(self.user, datafile_id)
         if deleted:
+            # Exclui as sentenças
             sentences_service = SentencesService(self.get_datafile(datafile_id))
-            return sentences_service.delete_sentences_from_datafile()
+            deleted += sentences_service.delete_sentences_from_datafile()
+
+            # Exclui os wordclouds
+            wordcloud_service = WordcloudService(datafile_id)
+            deleted += wordcloud_service.delete_wordcloud()
         return deleted
 
     def get_sentences(self, datafile_id: str, skip: int, limit: int):

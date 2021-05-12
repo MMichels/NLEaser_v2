@@ -32,7 +32,6 @@ list_sentendes_response_model: Model = ns_sentences.model(
 class SentencesResource(Resource):
     schema = SentenceSchema()
 
-
     @ns_sentences.expect(get_model, validate=False)
     @ns_sentences.marshal_with(list_sentendes_response_model)
     @error_handler(logger)

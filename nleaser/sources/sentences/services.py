@@ -6,7 +6,7 @@ from pandas import DataFrame
 from nleaser.models.datafile import DataFileModel
 from nleaser.models.sentence import SentenceModel
 from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel
-from nleaser.models.tasks.sentence.save import SentenceSaveTaskModel, SentenceSaveTaskSchema
+from nleaser.models.tasks.sentence.save import SaveSentenceTaskModel, SentenceSaveTaskSchema
 
 from nleaser.sources.logger import create_logger
 from nleaser.sources.rabbit.producer import RabbitProducer
@@ -32,7 +32,7 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
         schema = SentenceSaveTaskSchema()
         producer = RabbitProducer("NLEaser.sentence_import")
         for index, row in df.iterrows():
-            sentence_import_task: SentenceSaveTaskModel = schema.load({
+            sentence_import_task: SaveSentenceTaskModel = schema.load({
                 "owner": str(datafile.owner.id),
                 "datafile": str(datafile.id),
                 "parent": str(datafile_import_task.id),
@@ -59,10 +59,9 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
         )
 
 
-def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int) -> Union[List[SentenceSaveTaskModel], int]:
+def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int) -> Union[List[SaveSentenceTaskModel], int]:
     sentences = SentenceModel.objects(
-        datafile=datafile,
-        excluded=False
+        datafile=datafile
     )
     total = sentences.count()
     sentences_pag = sentences.skip(skip).limit(limit)
@@ -75,7 +74,6 @@ def list_sentences_from_datafile(datafile: DataFileModel, skip: int, limit: int)
 
 
 def delete_sentences_from_datafile(datafile: DataFileModel) -> bool:
-
-    deleted = SentenceModel.objects(datafile=datafile).update(set__excluded=True)
+    deleted = SentenceModel.objects(datafile=datafile).delete()
 
     return deleted > 0

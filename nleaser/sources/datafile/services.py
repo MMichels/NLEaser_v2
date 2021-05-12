@@ -36,9 +36,9 @@ def import_data_file(
     }
 
 
-def list_all_user_datafiles(user: UserModel ,orderby: str = "name", order_ascending: bool = True) -> List[DataFileModel]:
+def list_all_user_datafiles(user: UserModel, orderby: str = "name", order_ascending: bool = True) -> List[DataFileModel]:
     documents = DataFileModel.objects(
-        owner=user, excluded=False
+        owner=user
     ).order_by(
         ("+" if order_ascending else "-") + orderby
     ).all()
@@ -54,7 +54,6 @@ def get_datafile(user: UserModel, datafile_id: str) -> DataFileModel:
 
 def delete_data_file(user: UserModel, datafile_id: str):
     datafile = get_datafile(user, datafile_id)
-    datafile.excluded = True
-    datafile.save()
+    excluded = datafile.delete()
 
-    return datafile.excluded
+    return excluded

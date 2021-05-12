@@ -16,7 +16,6 @@ class DataFileModel(me.Document):
     language = me.fields.StringField(required=True, choices=["portuguese", "english"])
     text_column = me.fields.StringField(required=True)
     created_at = me.fields.DateTimeField(default=datetime.datetime.now)
-    excluded = me.fields.BooleanField(default=False)
 
 
 class DataFileSchema(ma.Schema):
@@ -26,7 +25,6 @@ class DataFileSchema(ma.Schema):
     language = ma.fields.String(required=True)
     text_column = ma.fields.String(required=True)
     created_at = ma.fields.DateTime(default=datetime.datetime.now)
-    excluded = ma.fields.Boolean(default=False)
 
     @ma.post_load()
     def make_data_file(self, data, **kwargs):

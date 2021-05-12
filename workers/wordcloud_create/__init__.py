@@ -32,8 +32,7 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
     wordcloud_create_task.save()
     try:
         sentences: List[SentenceModel] = SentenceModel.objects(
-            datafile=wordcloud_create_task.datafile,
-            excluded=False
+            datafile=wordcloud_create_task.datafile
         ).all()
     except Exception as e:
         wordcloud_create_task.status = "error"
