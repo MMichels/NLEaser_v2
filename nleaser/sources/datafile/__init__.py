@@ -6,7 +6,6 @@ from nleaser.models.datafile import DataFileModel
 from nleaser.sources.datafile.services import delete_data_file, get_datafile, import_data_file, list_all_user_datafiles
 from nleaser.sources.sentences import SentencesService
 from nleaser.sources.tasks.datafile.upload import DataFileUploadTaskService
-from nleaser.sources.wordcloud import WordcloudService
 
 
 class DataFileService:

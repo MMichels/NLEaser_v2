@@ -14,6 +14,10 @@ class NGramEmbeddedDocument(me.EmbeddedDocument):
 
 
 class NGramsModel(me.Document):
+    meta = {
+        'collection': 'ngrams'
+    }
+
     datafile = me.ReferenceField(
         DataFileModel, required=True, reverse_delete_rule=me.CASCADE
     )

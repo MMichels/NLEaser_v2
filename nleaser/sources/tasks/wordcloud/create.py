@@ -7,9 +7,6 @@ from nleaser.sources.rabbit.producer import RabbitProducer
 
 from nleaser.models.datafile import DataFileModel
 from nleaser.models.user import UserModel
-from nleaser.sources.logger import create_logger
-
-logger = create_logger(__file__)
 
 
 class WordcloudCreateTaskService:
@@ -39,10 +36,10 @@ class WordcloudCreateTaskService:
 
         return tasks
 
-    def list_failed_tasks(self, datafile_id: str, dataInicial: datetime):
+    def list_failed_tasks(self, datafile_id: str, data_inicial: datetime):
         failed_tasks = WordcloudCreateTaskModel.objects(
             owner=self.user, datafile=datafile_id,
-            created_at__gte=dataInicial, status="error"
+            created_at__gte=data_inicial, status="error"
         ).order_by("-created_at")
 
         return failed_tasks

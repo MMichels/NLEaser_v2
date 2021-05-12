@@ -1,21 +1,17 @@
 from flask_jwt_extended import get_current_user
 
-from nleaser.models.datafile import DataFileModel
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
 from nleaser.models.wordcloud import WordcloudModel
-from nleaser.sources.wordcloud.services import delete_wordclouds_from_datafile, get_wordclouds_from_datafile
-from nleaser.sources.tasks.wordcloud.create import WordcloudCreateTaskService
+from nleaser.sources.datafile import DataFileService
 from nleaser.sources.secure import load_cipher
+from nleaser.sources.tasks.wordcloud.create import WordcloudCreateTaskService
+from nleaser.sources.wordcloud.services import delete_wordclouds_from_datafile, get_wordclouds_from_datafile
 
 
 class WordcloudService:
     def __init__(self, datafile_id: str = None):
         self.user = get_current_user()
-
-        if datafile_id:
-            self.datafile = DataFileModel.objects(
-                owner=self.user, id=datafile_id
-            ).first()
+        self.datafile = DataFileService().get_datafile(datafile_id)
 
     def create_wordcloud(self) -> WordcloudCreateTaskModel:
         service = WordcloudCreateTaskService(self.user)
