@@ -12,7 +12,6 @@ class SentenceModel(me.Document):
     index = me.fields.IntField(required=True, unique_with='datafile')
     content = me.fields.StringField(required=True)
     pre_processed_content = me.fields.StringField(required=False, default="")
-    excluded = me.fields.BooleanField(default=False)
 
 
 class SentenceSchema(ma.Schema):
@@ -20,7 +19,6 @@ class SentenceSchema(ma.Schema):
     index = ma.fields.Integer(required=True)
     content = ma.fields.Str(required=True)
     pre_processed_content = ma.fields.Str(required=False, default="")
-    excluded = ma.fields.Boolean(default=False)
 
     @ma.pre_load()
     def prepare_data(self, data, **kwargs):

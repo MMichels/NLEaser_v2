@@ -54,7 +54,6 @@ def get_datafile(user: UserModel, datafile_id: str) -> DataFileModel:
 
 def delete_data_file(user: UserModel, datafile_id: str):
     datafile = get_datafile(user, datafile_id)
-    datafile.excluded = True
-    datafile.save()
+    datafile.delete()
 
     return datafile.excluded

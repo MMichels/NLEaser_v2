@@ -4,7 +4,7 @@ import marshmallow as ma
 from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel, DataFileUploadTaskSchema
 
 
-class SentenceSaveTaskModel(DataFileUploadTaskModel):
+class SaveSentenceTaskModel(DataFileUploadTaskModel):
     task_name = me.fields.StringField(default="sentence_import")
     parent: DataFileUploadTaskModel = me.fields.ReferenceField(DataFileUploadTaskModel, required=True)
     content = me.fields.StringField(required=True)
@@ -18,4 +18,4 @@ class SentenceSaveTaskSchema(DataFileUploadTaskSchema):
 
     @ma.post_load()
     def create_task(self, data, **kwargs):
-        return SentenceSaveTaskModel(**data)
+        return SaveSentenceTaskModel(**data)

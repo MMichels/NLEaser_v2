@@ -5,7 +5,7 @@ from mongoengine import NotUniqueError
 from pika.channel import Channel
 
 from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel
-from nleaser.models.tasks.sentence.save import SentenceSaveTaskModel
+from nleaser.models.tasks.sentence.save import SaveSentenceTaskModel
 from nleaser.models.sentence import SentenceModel, SentenceSchema
 from nleaser.sources.secure import load_cipher
 
@@ -26,25 +26,25 @@ def preprocess_sentence(sentence: str, language: str) -> str:
     return p_sentence
 
 
-def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
+def process_task(save_sentence_task: SaveSentenceTaskModel) -> bool:
     # preprocessa a sentença
-    cipher = load_cipher(sentences_import_task.owner)
+    cipher = load_cipher(save_sentence_task.owner)
 
 
     try:
         preprocessed_sentence = preprocess_sentence(
-            cipher.decrypt(sentences_import_task.content.encode()).decode(),
-            sentences_import_task.datafile.language
+            cipher.decrypt(save_sentence_task.content.encode()).decode(),
+            save_sentence_task.datafile.language
         )
 
     except Exception as e:
-        sentences_import_task.status = "error"
-        sentences_import_task.error = "Erro ao preprocessar a sentenca"
-        sentences_import_task.save()
+        save_sentence_task.status = "error"
+        save_sentence_task.error = "Erro ao preprocessar a sentenca"
+        save_sentence_task.save()
         logger.error(
             "Erro ao preprocessar a sentenca",
             exc_info=True,
-            extra={"received_args": sentences_import_task.to_mongo()})
+            extra={"received_args": save_sentence_task.to_mongo()})
         return False
 
     # salva a sentença
@@ -52,9 +52,9 @@ def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
     try:
         schema = SentenceSchema()
         sentence: SentenceModel = schema.load({
-            "datafile": sentences_import_task.datafile,
-            "index": sentences_import_task.index,
-            "content": sentences_import_task.content,
+            "datafile": save_sentence_task.datafile,
+            "index": save_sentence_task.index,
+            "content": save_sentence_task.content,
             "pre_processed_content": cipher.encrypt(preprocessed_sentence.encode()).decode()
         })
         sentence.save()
@@ -62,19 +62,19 @@ def process_task(sentences_import_task: SentenceSaveTaskModel) -> bool:
         pass
 
     except Exception as e:
-        sentences_import_task.status = "error"
-        sentences_import_task.error = "Erro ao salvar a sentença"
-        sentences_import_task.save()
+        save_sentence_task.status = "error"
+        save_sentence_task.error = "Erro ao salvar a sentença"
+        save_sentence_task.save()
         logger.error(
             "Erro ao salvar a sentença",
             exc_info=True,
-            extra={"received_args": sentences_import_task.to_mongo()})
+            extra={"received_args": save_sentence_task.to_mongo()})
         return False
 
     # Atualiza o status da tarefa
-    sentences_import_task.progress = 1
-    sentences_import_task.status = "success"
-    sentences_import_task.save()
+    save_sentence_task.progress = 1
+    save_sentence_task.status = "success"
+    save_sentence_task.save()
 
     return True
 
@@ -86,8 +86,8 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
     try:
         task_info = json.loads(body.decode())
         logger.debug("Recuperando tarefa: " + task_info["task"])
-        sentences_import_task: SentenceSaveTaskModel = SentenceSaveTaskModel.objects(id=task_info["task"]).first()
-        if sentences_import_task is None:
+        save_sentence_task: SaveSentenceTaskModel = SaveSentenceTaskModel.objects(id=task_info["task"]).first()
+        if save_sentence_task is None:
             raise Exception("Não foi encontrada nenhuma tarefa com o id " + task_info["task"])
 
     except Exception as e:
@@ -98,9 +98,9 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
         )
         return False
 
-    success_task = process_task(sentences_import_task)
+    success_task = process_task(save_sentence_task)
 
-    datafile_import_task = sentences_import_task.parent
+    datafile_import_task = save_sentence_task.parent
 
     if datafile_import_task.status == "queued":
         datafile_import_task.status == "in_progress"
@@ -122,7 +122,7 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
 
     datafile_import_task.reload("progress", "total")
     if datafile_import_task.progress >= datafile_import_task.total:
-        tasks_with_fail = SentenceSaveTaskModel.objects(
+        tasks_with_fail = SaveSentenceTaskModel.objects(
             parent=datafile_import_task,
             status="error"
         ).count()
@@ -136,6 +136,10 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
             datafile_import_task.status = "success"
 
         datafile_import_task.save()
+
+        # Exclui as tarefas de processamento (Evitar dados duplicados)
+        SaveSentenceTaskModel.objects(parent=datafile_import_task, error="").delete()
+        SaveSentenceTaskModel.objects(parent=datafile_import_task).update(set__content="CONTEUDO REMOVIDO")
 
     logger.debug("Tarefa concluida: " + task_info["task"])
 

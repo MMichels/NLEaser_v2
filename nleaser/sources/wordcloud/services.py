@@ -13,6 +13,6 @@ def get_wordclouds_from_datafile(datafile: DataFileModel) -> QuerySet:
 
 def delete_wordclouds_from_datafile(datafile: DataFileModel) -> bool:
     deleted = WordcloudModel.objects(
-        datafile=datafile, excluded=False
-    ).update(set__excluded=True)
+        datafile=datafile
+    ).delete()
     return deleted > 0
