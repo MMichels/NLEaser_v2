@@ -10,7 +10,7 @@ class DataFileModel(me.Document):
         'collection': 'datafile'
     }
 
-    owner = me.fields.ReferenceField(UserModel)
+    owner = me.fields.ReferenceField(UserModel, required=True, reverse_delete_rule=me.CASCADE)
     name = me.fields.StringField()
     format = me.fields.StringField(required=True, choices=['csv', 'xlsx', 'txt'])
     language = me.fields.StringField(required=True, choices=["portuguese", "english"])

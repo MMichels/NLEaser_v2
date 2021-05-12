@@ -7,7 +7,7 @@ from nleaser.models.tasks import TaskModel, TaskSchema
 
 class WordcloudCreateTaskModel(TaskModel):
     task_name = me.fields.StringField(default="wordcloud_create")
-    datafile = me.fields.ReferenceField(DataFileModel, required=True)
+    datafile = me.fields.ReferenceField(DataFileModel, required=True, reverse_delete_rule=me.CASCADE)
     total = me.fields.IntField(default=1)
 
 

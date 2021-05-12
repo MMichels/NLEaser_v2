@@ -11,7 +11,7 @@ class DataFileUploadTaskModel(TaskModel):
     }
 
     task_name = me.fields.StringField(default="datafile_import")
-    datafile: DataFileModel = me.fields.ReferenceField(DataFileModel, required=True)
+    datafile: DataFileModel = me.fields.ReferenceField(DataFileModel, required=True, reverse_delete_rule=me.CASCADE)
 
 
 class DataFileUploadTaskSchema(TaskSchema):

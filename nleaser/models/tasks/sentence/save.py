@@ -6,7 +6,7 @@ from nleaser.models.tasks.datafile.upload import DataFileUploadTaskModel, DataFi
 
 class SaveSentenceTaskModel(DataFileUploadTaskModel):
     task_name = me.fields.StringField(default="sentence_import")
-    parent: DataFileUploadTaskModel = me.fields.ReferenceField(DataFileUploadTaskModel, required=True)
+    parent: DataFileUploadTaskModel = me.fields.ReferenceField(DataFileUploadTaskModel, required=True, reverse_delete_rule=me.CASCADE)
     content = me.fields.StringField(required=True)
     index = me.fields.IntField(required=True)
 

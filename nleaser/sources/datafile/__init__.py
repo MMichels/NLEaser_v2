@@ -40,15 +40,7 @@ class DataFileService:
 
     def delete_datafile(self, datafile_id: str) -> bool:
         deleted = delete_data_file(self.user, datafile_id)
-        if deleted:
-            # Exclui as sentenças
-            sentences_service = SentencesService(self.get_datafile(datafile_id))
-            deleted += sentences_service.delete_sentences_from_datafile()
-
-            # Exclui os wordclouds
-            wordcloud_service = WordcloudService(datafile_id)
-            deleted += wordcloud_service.delete_wordcloud()
-        return deleted
+        return True
 
     def get_sentences(self, datafile_id: str, skip: int, limit: int):
         datafile = self.get_datafile(datafile_id)

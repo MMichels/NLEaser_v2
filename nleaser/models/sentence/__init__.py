@@ -8,7 +8,7 @@ class SentenceModel(me.Document):
     meta = {
         'collection': 'sentence'
     }
-    datafile = me.fields.ReferenceField(DataFileModel, required=True)
+    datafile = me.fields.ReferenceField(DataFileModel, required=True, reverse_delete_rule=me.CASCADE)
     index = me.fields.IntField(required=True, unique_with='datafile')
     content = me.fields.StringField(required=True)
     pre_processed_content = me.fields.StringField(required=False, default="")

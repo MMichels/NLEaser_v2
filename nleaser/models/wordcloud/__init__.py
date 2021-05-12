@@ -11,7 +11,7 @@ class WordcloudModel(me.Document):
         "collection": "wordcloud"
     }
 
-    datafile = me.fields.ReferenceField(DataFileModel, required=True)
+    datafile = me.fields.ReferenceField(DataFileModel, required=True, reverse_delete_rule=me.CASCADE)
     created_at = me.fields.DateTimeField(default=datetime.now)
     base64_image = me.fields.StringField(required=True)
 

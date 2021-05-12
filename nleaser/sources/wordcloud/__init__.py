@@ -14,7 +14,7 @@ class WordcloudService:
 
         if datafile_id:
             self.datafile = DataFileModel.objects(
-                owner=self.user, id=datafile_id, excluded=False
+                owner=self.user, id=datafile_id
             ).first()
 
     def create_wordcloud(self) -> WordcloudCreateTaskModel:
