@@ -17,7 +17,10 @@ logger = logging.getLogger("wordcloud_create")
 
 def create_base64_wordcloud(user: UserModel, sentences: List[SentenceModel], language: str) -> bytes:
     cipher = load_cipher(user)
-    pre_processed_sentences = [cipher.decrypt(sentence.pre_processed_content.encode()).decode() for sentence in sentences]
+    pre_processed_sentences = [
+        cipher.decrypt(sentence.pre_processed_content.encode()).decode()
+        for sentence in sentences
+    ]
     wordcloud = generate_wordcloud(pre_processed_sentences, language)
     image = wordcloud.to_image()
     buffer = BytesIO()
@@ -29,6 +32,8 @@ def create_base64_wordcloud(user: UserModel, sentences: List[SentenceModel], lan
 def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
     # Recupera as sentenças
     wordcloud_create_task.status = "in_progress"
+    wordcloud_create_task.total = 3
+    wordcloud_create_task.progress = 1
     wordcloud_create_task.save()
     try:
         sentences: List[SentenceModel] = SentenceModel.objects(
@@ -36,7 +41,7 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
         ).all()
     except Exception as e:
         wordcloud_create_task.status = "error"
-        wordcloud_create_task.error = "Erro ao importar as sentençs desse arquivo"
+        wordcloud_create_task.error = "Erro ao importar as sentenças desse arquivo"
         wordcloud_create_task.save()
         logger.error(
             wordcloud_create_task.error,
@@ -53,6 +58,8 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
             sentences,
             wordcloud_create_task.datafile.language
         )
+        wordcloud_create_task.progress += 1
+        wordcloud_create_task.save()
     except Exception as e:
         wordcloud_create_task.status = "error"
         wordcloud_create_task.error = "Erro ao gerar o wordcloud em base64"
@@ -74,9 +81,12 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
             "base64_image": cipher.encrypt(base64_image).decode()
         })
         model.save()
+        wordcloud_create_task.progress += 1
+        wordcloud_create_task.save()
+
     except Exception as e:
         wordcloud_create_task.status = "error"
-        wordcloud_create_task.error = "Erro ao salvar o wordcloud no bd"
+        wordcloud_create_task.error = "Erro ao salvar o WordCloud"
         wordcloud_create_task.save()
         logger.error(
             wordcloud_create_task.error,
@@ -84,8 +94,6 @@ def process_task(wordcloud_create_task: WordcloudCreateTaskModel) -> bool:
             extra={"received_args": wordcloud_create_task.to_mongo()}
         )
         return False
-
-    wordcloud_create_task.progress = 1
     wordcloud_create_task.status = "success"
     wordcloud_create_task.save()
 
@@ -115,17 +123,15 @@ def wordcloud_create_consumer(ch, method, properties, body):
         return False
 
     success_task = process_task(wordcloud_create_task)
+    logger.debug("Finalizando tarefa: " + task_info["task"])
 
     if success_task:
         ch.basic_ack(delivery_tag=method.delivery_tag)
+        return True
 
     else:
         ch.basic_nack(
             delivery_tag=method.delivery_tag,
             requeue=False
         )
-
-
-    logger.debug("Finalizando tarefa: " + task_info["task"])
-
-    return True
+        return False

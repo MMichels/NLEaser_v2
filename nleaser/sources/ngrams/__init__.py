@@ -1,7 +1,10 @@
 from flask_jwt_extended import get_current_user
 
+from nleaser.models.ngrams import NGramsModel, NGramEmbeddedDocument
 from nleaser.models.tasks.ngrams.create import NGramsCreateTaskSchema
 from nleaser.sources.datafile import DataFileService
+from nleaser.sources.ngrams.services import get_ngrams_from_datafile, delete_ngrams_from_datafile
+from nleaser.sources.secure import load_cipher
 from nleaser.sources.tasks.ngrams.create import NGramsCreateTaskService
 
 
@@ -14,3 +17,16 @@ class NGramsService:
         service = NGramsCreateTaskService(self.user)
         create_ngram_task = service.create(self.datafile, size)
         return create_ngram_task
+
+    def get_ngram(self, skip: int, limit: int, order_by: str = "relevance", order_ascending: bool = False) -> NGramsModel:
+        ngrams = get_ngrams_from_datafile(self.datafile, skip, limit, order_by, bool(order_ascending))
+        if ngrams:
+            return ngrams
+        else:
+            raise FileNotFoundError("Nenhum NGram encontrado")
+
+    def delete_ngram(self) -> bool:
+        deleted = delete_ngrams_from_datafile(self.datafile)
+        return deleted
+
+

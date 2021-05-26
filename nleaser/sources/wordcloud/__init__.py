@@ -19,14 +19,14 @@ class WordcloudService:
         return create_wordcloud_task
 
     def get_wordcloud(self) -> WordcloudModel:
-        private_cipher = load_cipher(self.user)
         wcs = get_wordclouds_from_datafile(self.datafile)
         wc: WordcloudModel = wcs.first()
         if wc:
+            private_cipher = load_cipher(self.user)
             wc.base64_image = private_cipher.decrypt(wc.base64_image.encode()).decode()
             return wc
         else:
-            raise FileNotFoundError("Ainda não existe nenhum wordcloud para esse conjunto de dados")
+            raise FileNotFoundError("Nenhum wordcloud encontrado")
 
     def delete_wordcloud(self) -> bool:
         deleted = delete_wordclouds_from_datafile(self.datafile)

@@ -28,7 +28,7 @@ delete_wordcloud_response_model = ns_wordcloud.model("delete_wordcloud_response_
 # TASKS
 get_wc_tasks_response_model = get_tasks_response_model.copy()
 get_wc_tasks_response_model["tasks"] = fields.Nested(
-    ns_wordcloud.model("tasks_model", tasks_model),
+    ns_wordcloud.model("wc_tasks_model", tasks_model),
     as_list=True
 )
 get_wc_tasks_response_model = ns_wordcloud.model("get_wc_tasks_response_model", get_wc_tasks_response_model)
@@ -43,7 +43,7 @@ class WordcloudsResource(Resource):
     @jwt_required
     def post(self, datafile_id):
         """
-            Cria um novo Wordcloud
+            Processa um novo Wordcloud
         """
         service = WordcloudService(datafile_id)
 
@@ -57,7 +57,7 @@ class WordcloudsResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Recupera o ultimo Wordcloud criado
+            Recupera o ultimo Wordcloud Processado
         """
         service = WordcloudService(datafile_id)
         wc = service.get_wordcloud()
@@ -68,7 +68,7 @@ class WordcloudsResource(Resource):
     @jwt_required
     def delete(self, datafile_id):
         """
-            Exclui um wordcloud
+            Exclui o wordcloud
         """
         service = WordcloudService(datafile_id)
         deleted = service.delete_wordcloud()
@@ -79,7 +79,7 @@ class WordcloudsResource(Resource):
 
 
 @ns_wordcloud.route("/<string:datafile_id>/tasks", methods=["GET"])
-class WordCloudsTaskResouce(Resource):
+class WordCloudsTaskResource(Resource):
     schema = WordcloudCreateTaskSchema()
 
     @ns_wordcloud.marshal_with(get_wc_tasks_response_model)
@@ -87,7 +87,7 @@ class WordCloudsTaskResouce(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Verifica todas as requisições para criação de wordclouds que estão em progresso
+            Verifica todas as requisições para processamento de Wordcloud do datafile
         """
         service = WordcloudCreateTaskService(get_current_user())
         tasks = service.list_current_tasks(datafile_id)

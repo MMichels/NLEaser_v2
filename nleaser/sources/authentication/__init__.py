@@ -9,10 +9,13 @@ class AuthenticationService:
         self.schema = UserSchema()
 
     def authenticate(self, email, password):
-        user = authenticate(email, password)
-        if user:
-            access_token = create_access_token(self.schema.dump(user))
-            return access_token
+        try:
+            user = authenticate(email, password)
+            if user:
+                access_token = create_access_token(self.schema.dump(user))
+                return access_token
+        except Exception as e:
+            raise e
 
     def get_current_user(self):
         return get_jwt_identity()
