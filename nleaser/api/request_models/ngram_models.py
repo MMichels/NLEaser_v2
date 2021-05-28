@@ -48,6 +48,7 @@ get_model.add_argument(
 get_model.add_argument(
     "order_ascending",
     required=False,
+    default=0,
     choices=[0, 1],
     type=int,
     location='args',
@@ -81,6 +82,10 @@ ngrams_model = {
     'size': fields.Integer(
         required=True,
         description="Tamanho dos grams analisados"
+    ),
+    'total': fields.Integer(
+        required=True,
+        description="Total de ngrams extraidos"
     )
 }
 

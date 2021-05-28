@@ -34,10 +34,13 @@ def get_ngrams_from_datafile(datafile: DataFileModel, skip: int, limit: int, ord
             }
         }
     ]
-    ngram = NGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
-    ngram_model = NGramsSchema().load(ngram)
+    try:
+        ngram = NGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
+        ngram_model = NGramsSchema().load(ngram)
 
-    return ngram_model
+        return ngram_model
+    except Exception as e:
+        return None
 
 
 def delete_ngrams_from_datafile(datafile: DataFileModel) -> bool:

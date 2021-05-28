@@ -2,7 +2,6 @@ from datetime import datetime
 
 import mongoengine as me
 import marshmallow as ma
-from bson import ObjectId
 from marshmallow import validate
 
 
@@ -55,8 +54,9 @@ class NGramsSchema(ma.Schema):
 
     @ma.pre_load
     def prepare_data(self, data, **kwargs):
-        data["datafile"] = data["datafile"].id if type(data["datafile"]) is DataFileModel else str(data["datafile"])
-        data["created_at"] = data["created_at"].isoformat() if type(data["created_at"])  is datetime else str(data["created_at"])
+        data["datafile"] = str(data["datafile"].id) if type(data["datafile"]) is DataFileModel else str(data["datafile"])
+        if "created_at" in data:
+            data["created_at"] = data["created_at"].isoformat() if type(data["created_at"])  is datetime else str(data["created_at"])
         return data
 
     @ma.post_load
