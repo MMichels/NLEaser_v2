@@ -42,10 +42,12 @@ class ConfigModel(me.Document):
 def config_rabbit_access():
     user = ConfigModel(
         name="RABBIT_USER",
+        value=crypt("guest"),
         cripted=True
     )
     pwd = ConfigModel(
         name="RABBIT_PASS",
+        value=crypt("guest"),
         cripted=True
     )
     user.save()
