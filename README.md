@@ -10,9 +10,9 @@ Aplicação web para analise de texto utilizando tecnicas de NLP, com foco em re
 4 - Clone o repositório para um diretorio local \
 5 - Instale as dependencias com 'pip install -r requirements.txt' \
 6 - Verifique as configurações no arquivo setup.py \
-7 - Configure o acesso ao RabbitMQ no arquivo nleaser/models/config/__init__.py \ 
-  7.1 - Na função 'config_rabbit_access' altere o atributo "value" dos objetos user e pwd \
-  7.2 - Execute o arquivo com o comando: 'python nleaser/models/config/__init__.py' \
+7 - Configure o acesso ao RabbitMQ no arquivo nleaser/models/config/__init__.py \
+7.1 - Na função 'config_rabbit_access' altere o atributo "value" dos objetos user e pwd \
+7.2 - Execute o arquivo com o comando: 'python nleaser/models/config/__init__.py' \
 8 - Execute a aplicação com o comando: 'python main.py'
 
 ### Desenvolvedores
