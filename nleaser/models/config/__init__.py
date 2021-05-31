@@ -39,28 +39,23 @@ class ConfigModel(me.Document):
         return self
 
 
+def config_rabbit_access():
+    user = ConfigModel(
+        name="RABBIT_USER",
+        value=crypt("guest"),
+        cripted=True
+    )
+    pwd = ConfigModel(
+        name="RABBIT_PASS",
+        value=crypt("guest"),
+        cripted=True
+    )
+    user.save()
+    pwd.save()
+
+
 if __name__ == '__main__':
     from nleaser.models import connect_db
 
     connect_db()
-
-    while True:
-        name = input("Nome da config: ")
-        value = input("Valor: ")
-        cripted = input("Criptografar? (s/n)").lower()[0] == 's'
-
-        cfg = ConfigModel(
-            name=name,
-            value=value,
-            cripted=cripted
-        )
-
-        try:
-            cfg.save()
-            print("Salvo!")
-        except Exception as ex:
-            print("Erro ao salvar: ", ex)
-
-        interromper = input("Continuar? (s/n)").lower()[0] == 'n'
-        if interromper:
-            break
+    config_rabbit_access()
