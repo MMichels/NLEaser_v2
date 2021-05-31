@@ -3,7 +3,7 @@ from nleaser.sources.logger import create_logger
 from workers.wordcloud_create import wordcloud_create_consumer
 
 
-logger = create_logger("wordcloud_create")
+logger = create_logger("_wordcloud_create")
 
 if __name__ == '__main__':
     import time
@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
         try:
             logger.info("Conectando ao rabbitmq")
-            consumer = RabbitConsumer("NLEaser.wordcloud_create")
+            consumer = RabbitConsumer("NLEaser._wordcloud_create")
             logger.info("Consumindo")
             consumer.consume(wordcloud_create_consumer, auto_ack=False, prefetch=1)
 

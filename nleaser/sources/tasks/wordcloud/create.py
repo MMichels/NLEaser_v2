@@ -13,7 +13,7 @@ class WordcloudCreateTaskService:
     def __init__(self, user: UserModel):
         self.user = user
         self.schema = WordcloudCreateTaskSchema()
-        self.producer = RabbitProducer("NLEaser.wordcloud_create")
+        self.producer = RabbitProducer("NLEaser._wordcloud_create")
 
     def create(self, datafile: DataFileModel) -> WordcloudCreateTaskModel:
         model: WordcloudCreateTaskModel = self.schema.load({

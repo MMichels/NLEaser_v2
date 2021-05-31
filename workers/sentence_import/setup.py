@@ -26,7 +26,7 @@ setup(
     ],
     packages=find_packages(
         where="../../../NLEaser_v2",
-        exclude=["api*", "workers.wordcloud_create"],
+        exclude=["api*", "workers._wordcloud_create"],
     ),
     package_dir={"": "../../../NLEaser_v2"},
     classifiers=[

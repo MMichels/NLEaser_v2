@@ -10,7 +10,7 @@ def get_version():
 
 
 setup(
-    name="wordcloud_create-worker-NLEaser",
+    name="_wordcloud_create-worker-NLEaser",
     version=get_version(),
     description="Consumer do rabbit para gerar o wordcloud do dataset",
     author="Mateus Michels de Oliveira, Lucas Domiciano",
