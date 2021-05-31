@@ -1,9 +1,8 @@
-import os
 from nleaser.config.secure import decrypt
 
 # CONFIGS FLASK
 DEBUG = True
-SECRET_KEY = decrypt('aIoAE/xxJh6Jgmd4k6x31HEMRkHdp9ZJFSj2AuqMwjNdedqriYQNRZk0Co1FH8KR')
+SECRET_KEY = "" +\
 ENV = "development"
 HOST = "localhost"
 PORT = 5000
@@ -12,13 +11,18 @@ PORT = 5000
 MONGO_HOST = "localhost"
 MONGO_PORT = 27017
 MONGO_DB = "nleaser"
+MONGO_TLS = True
+MONGO_TLS_INVALID = True
 MONGO_USER = "" +\
 MONGO_PASSWORD = "" +\
 
 # CONFIGS JWT
 JWT_SECRET_KEY = SECRET_KEY
-JWT_ACCESS_TOKEN_EXPIRES = 43200 # 12horas
+JWT_ACCESS_TOKEN_EXPIRES = 43200    # 12horas
 
 # CONFIGS RABBIT
 RABBIT_HOST = "localhost"
 RABBIT_PORT = 5672
+
+
+
