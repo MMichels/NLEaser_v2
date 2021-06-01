@@ -16,12 +16,6 @@ class WordcloudCreateTaskSchema(TaskSchema):
     datafile = ma.fields.String(required=True)
     total = ma.fields.Int(default=1)
 
-    @ma.pre_load()
-    def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id) if data["owner"] else ""
-        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
-        return data
-
     @ma.post_load()
     def create_task(self, data, **kwargs):
         return WordcloudCreateTaskModel(**data)
