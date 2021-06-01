@@ -1,0 +1,43 @@
+from datetime import datetime
+
+import marshmallow as ma
+import mongoengine as me
+
+from marshmallow import validate
+from nleaser.models.datafile import DataFileModel
+from nleaser.models.nlp_extracted_data import NLPExtractedDataModel, NLPExtractedDataSchema
+
+
+class EntityModel(me.EmbeddedDocument):
+    content = me.StringField(required=True)
+    entity = me.StringField(required=True)
+    count = me.IntField(required=False)
+
+
+class NerResumeModel(NLPExtractedDataModel):
+    meta = {
+        'collection': 'ner'
+    }
+    extracted_entities = me.EmbeddedDocumentListField(
+        EntityModel
+    )
+
+
+class EntitySchema(ma.Schema):
+    content = ma.fields.String(required=True)
+    entity = ma.fields.String(required=True)
+    count = ma.fields.Integer(required=False)
+
+    @ma.post_load()
+    def create_entity(self, data, **kwargs):
+        return EntityModel(**data)
+
+
+class NerResumeSchema(NLPExtractedDataSchema):
+    extracted_entities = ma.fields.Nested(
+        EntitySchema, many=True, required=True, unknow=ma.EXCLUDE
+    )
+
+    @ma.post_load()
+    def create_ner_resume(self, data, **kwargs):
+        return NerResumeModel(**data)
