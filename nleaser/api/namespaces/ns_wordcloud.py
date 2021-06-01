@@ -6,7 +6,7 @@ from nleaser.api.request_models import tasks_model, get_tasks_response_model
 from nleaser.api.request_models.wordcloud_models import get_response_model, \
     delete_response_model, post_response_model
 
-from nleaser.models.wordcloud import WordcloudSchema
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudSchema
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskSchema
 from nleaser.sources.wordcloud import WordcloudService
 from nleaser.sources.tasks.wordcloud.create import WordcloudCreateTaskService

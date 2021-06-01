@@ -5,7 +5,7 @@ from nleaser.api.error_handler import error_handler
 from nleaser.api.request_models import get_tasks_response_model, tasks_model
 from nleaser.api.request_models.ngram_models import post_model, post_response_model, get_response_model, \
     delete_response_model, ngram_model, get_model
-from nleaser.models.ngrams import NGramsSchema
+from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsSchema
 from nleaser.models.tasks.ngrams.create import NGramsCreateTaskSchema
 from nleaser.sources.logger import create_logger
 from nleaser.sources.ngrams import NGramsService
@@ -41,7 +41,7 @@ get_ngrams_tasks_response_model = ns_ngrams.model("get_ngrams_tasks_response_mod
 
 @ns_ngrams.route("/<string:datafile_id>", methods=["POST", "GET", "DELETE"])
 class NGramsResource(Resource):
-    ngrams_schema = NGramsSchema()
+    ngrams_schema = ExtractedNGramsSchema()
 
     @ns_ngrams.expect(post_model, validate=False)
     @ns_ngrams.marshal_with(create_ngram_response_model, code=201)

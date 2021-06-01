@@ -1,6 +1,6 @@
 import pika as pk
 
-from queues import get_queue_config
+from .queues import get_queue_config
 
 from nleaser.config import RABBIT_HOST, RABBIT_PORT
 from nleaser.models.config import ConfigModel

@@ -6,7 +6,7 @@ from pandas import DataFrame
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import Basic
 
-from nleaser.models.ngrams import NGramsModel, NGramsSchema
+from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsModelModel, ExtractedNGramsSchema
 from nleaser.models.sentence import SentenceModel
 from nleaser.models.tasks.ngrams.create import NGramsCreateTaskModel
 from nleaser.models.user import UserModel
@@ -74,10 +74,10 @@ def process_task(ngram_create_task: NGramsCreateTaskModel) -> bool:
 
     # Salva os Ngrams
     try:
-        ngrams_schema = NGramsSchema()
+        ngrams_schema = ExtractedNGramsSchema()
         ngrams = [ngram.to_dict() for _, ngram in ngrams_df.iterrows()]
 
-        ngrams_model: NGramsModel = ngrams_schema.load({
+        ngrams_model: ExtractedNGramsModelModel = ngrams_schema.load({
             'datafile': ngram_create_task.datafile,
             'ngrams': ngrams,
             'size': ngram_create_task.size,

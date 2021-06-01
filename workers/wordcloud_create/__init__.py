@@ -7,7 +7,7 @@ from typing import List
 from nleaser.models.user import UserModel
 from nleaser.models.sentence import SentenceModel
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
-from nleaser.models.wordcloud import WordcloudModel, WordcloudSchema
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudModel, WordcloudSchema
 
 from nleaser.sources.nlp.tfidf.wordcloud import generate_wordcloud
 from nleaser.sources.secure import load_cipher
