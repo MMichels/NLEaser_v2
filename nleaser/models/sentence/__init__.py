@@ -2,6 +2,7 @@ import mongoengine as me
 import marshmallow as ma
 
 from nleaser.models.datafile import DataFileModel
+from nleaser.models.nlp_extracted_data.ner import EntitySchema, EntityModel
 
 
 class SentenceModel(me.Document):
@@ -12,6 +13,9 @@ class SentenceModel(me.Document):
     index = me.fields.IntField(required=True, unique_with='datafile')
     content = me.fields.StringField(required=True)
     pre_processed_content = me.fields.StringField(required=False, default="")
+    ner_content = me.fields.EmbeddedDocumentListField(
+        EntityModel, required=False
+    )
 
 
 class SentenceSchema(ma.Schema):
@@ -19,6 +23,9 @@ class SentenceSchema(ma.Schema):
     index = ma.fields.Integer(required=True)
     content = ma.fields.Str(required=True)
     pre_processed_content = ma.fields.Str(required=False, default="")
+    ner_content = ma.fields.Nested(
+        EntitySchema, many=True, required=False
+    )
 
     @ma.pre_load()
     def prepare_data(self, data, **kwargs):
