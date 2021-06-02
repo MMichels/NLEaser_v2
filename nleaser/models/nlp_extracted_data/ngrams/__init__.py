@@ -14,7 +14,7 @@ class NGramModel(me.EmbeddedDocument):
     relevance = me.FloatField(required=True)
 
 
-class ExtractedNGramsModelModel(NLPExtractedDataModel):
+class ExtractedNGramsModel(NLPExtractedDataModel):
     meta = {
         'collection': 'ngrams'
     }
@@ -44,4 +44,4 @@ class ExtractedNGramsSchema(NLPExtractedDataSchema):
 
     @ma.post_load
     def create_ngrams(self, data, **kwargs):
-        return ExtractedNGramsModelModel(**data)
+        return ExtractedNGramsModel(**data)

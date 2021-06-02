@@ -1,10 +1,6 @@
-from datetime import datetime
-
 import marshmallow as ma
 import mongoengine as me
 
-from marshmallow import validate
-from nleaser.models.datafile import DataFileModel
 from nleaser.models.nlp_extracted_data import NLPExtractedDataModel, NLPExtractedDataSchema
 
 
