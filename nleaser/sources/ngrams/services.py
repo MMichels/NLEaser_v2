@@ -1,8 +1,11 @@
 from nleaser.models.datafile import DataFileModel
-from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsModelModel, ExtractedNGramsSchema
+from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsModel, ExtractedNGramsSchema
 
 
-def get_ngrams_from_datafile(datafile: DataFileModel, skip: int, limit: int, order_by: str, order_ascending: bool) -> ExtractedNGramsModelModel:
+def get_ngrams_from_datafile(
+        datafile: DataFileModel, skip: int, limit: int,
+        order_by: str, order_ascending: bool
+) -> ExtractedNGramsModel:
     search_pipeline = [
         {
             "$match": {
@@ -35,16 +38,16 @@ def get_ngrams_from_datafile(datafile: DataFileModel, skip: int, limit: int, ord
         }
     ]
     try:
-        ngram = ExtractedNGramsModelModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
+        ngram = ExtractedNGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
         ngram_model = ExtractedNGramsSchema().load(ngram)
 
         return ngram_model
-    except Exception as e:
+    except:
         return None
 
 
 def delete_ngrams_from_datafile(datafile: DataFileModel) -> bool:
-    deleted = ExtractedNGramsModelModel.objects(
+    deleted = ExtractedNGramsModel.objects(
         datafile=datafile
     ).delete()
     return deleted > 0
