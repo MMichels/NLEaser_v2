@@ -6,8 +6,8 @@ _sentence_import = {
 
 _wordcloud_create = {
     "exchange": "NLEaser",
-    "queue": "_wordcloud_create",
-    "routing_key": "NLEaser._wordcloud_create",
+    "queue": "wordcloud_create",
+    "routing_key": "NLEaser.wordcloud_create",
 }
 
 _ngrams_create = {

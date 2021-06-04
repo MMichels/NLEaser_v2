@@ -3,7 +3,7 @@ from nleaser.sources.logger import create_logger
 from workers.wordcloud_create import wordcloud_create_consumer
 
 
-logger = create_logger("_wordcloud_create")
+logger = create_logger("wordcloud_create")
 
 if __name__ == '__main__':
     import time

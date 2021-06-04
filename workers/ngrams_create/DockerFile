@@ -3,7 +3,7 @@ FROM python:3.6
 RUN apt-get update
 
 ADD ./resources/safebox-nleaser.tar.gz .
-COPY ./workers/sentence_import/dist/sentence_import*.whl .
+COPY ./workers/ngrams_create/dist/ngrams_create*.whl .
 
 # Install safebox
 WORKDIR safebox-nleaser
@@ -11,10 +11,10 @@ RUN pip3 install Cython
 RUN python setup.py install
 WORKDIR /
 
-RUN pip3 install sentence_import*.whl
+RUN pip3 install ngrams_create*.whl
 
 ENV ENV=development
 ENV HOST=docker
 
-ENTRYPOINT ["python", "-m", "workers.sentence_import"]
+CMD ["python", "-m", "workers.ngrams_create"]
 

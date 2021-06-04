@@ -10,9 +10,9 @@ def get_version():
 
 
 setup(
-    name="wordcloud_create-worker-NLEaser",
+    name="ngrams_create-worker-NLEaser",
     version=get_version(),
-    description="Consumer do rabbit para gerar o wordcloud do dataset",
+    description="Consumer do rabbit para extrair ngrams",
     author="Mateus Michels de Oliveira, Lucas Domiciano",
     author_email="michels09@hotmail.com, lucas2809@live.com",
     python_requires=">=3.6",
@@ -22,11 +22,12 @@ setup(
         "mongoengine==0.20.0",
         "nltk==3.4.4",
         "pika==1.1.0",
-        "wordcloud==1.8.1"
+        "pandas==1.1.5",
+        "scikit-learn~=0.24.2"
     ],
     packages=find_packages(
         where="../../../NLEaser_v2",
-        exclude=["api*", "workers.sentence_import", "workers.ngrams_create"]
+        exclude=["api*", "workers.wordcloud_create", "workers.sentence_import"],
     ),
     package_dir={"": "../../../NLEaser_v2"},
     classifiers=[
