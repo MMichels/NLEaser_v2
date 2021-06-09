@@ -10,6 +10,7 @@ class RabbitConector:
     rabbit_host = RABBIT_HOST
     rabbit_port = RABBIT_PORT
     channel: pk.adapters.blocking_connection.BlockingChannel = None
+    connection: pk.BlockingConnection = None
 
     def __init__(self, queue_name):
         self.rabbit_user = ConfigModel.objects(name="RABBIT_USER").first().value
@@ -49,5 +50,5 @@ class RabbitConector:
         )
 
         self.channel = channel
-
+        self.connection = conn
         return channel
