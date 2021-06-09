@@ -9,7 +9,7 @@ from nleaser.models.tasks.sentence.save import SaveSentenceTaskModel
 from nleaser.models.sentence import SentenceModel, SentenceSchema
 from nleaser.sources.secure import load_cipher
 
-from nleaser.sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers
+from nleaser.sources.nlp.preprocessing import tokenize, remove_token_accents, mask_token_numbers, remove_punkt
 
 logger = logging.getLogger("sentence_import")
 
@@ -19,7 +19,9 @@ def preprocess_sentence(sentence: str, language: str) -> str:
 
     tokens = tokenize(p_sentence, language)
     tokens = map(remove_token_accents, tokens)
-    tokens = map(mask_token_numbers, tokens)
+    #tokens = map(mask_token_numbers, tokens)
+    tokens = map(remove_punkt, tokens)
+    tokens = map(lambda x: x.strip(), tokens)
 
     p_sentence = " ".join(tokens)
 
@@ -103,7 +105,7 @@ def sentence_preprocessor_consumer(ch: Channel, method, properties, body):
     datafile_import_task = save_sentence_task.parent
 
     if datafile_import_task.status == "queued":
-        datafile_import_task.status == "in_progress"
+        datafile_import_task.status = "in_progress"
         datafile_import_task.save()
 
     DataFileUploadTaskModel.objects(

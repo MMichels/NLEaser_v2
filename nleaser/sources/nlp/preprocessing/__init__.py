@@ -23,3 +23,9 @@ def remove_token_accents(token):
 def mask_token_numbers(token, mask='#'):
     masked = re.sub(r'[0-9]', mask, token)
     return masked
+
+
+@lru_cache(maxsize=1000)
+def remove_punkt(token):
+    no_punkt = re.sub(r'[^a-zA-Z!?.,-]', " ", token)
+    return no_punkt

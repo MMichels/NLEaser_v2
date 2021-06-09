@@ -3,6 +3,7 @@ from datetime import datetime
 import mongoengine as me
 import marshmallow as ma
 
+from nleaser.models.datafile import DataFileModel
 from nleaser.models.user import UserModel
 
 
@@ -42,8 +43,8 @@ class TaskSchema(ma.Schema):
 
     @ma.pre_load()
     def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id) if data["owner"] else ""
-        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
+        data["owner"] = str(data["owner"].id) if type(data["owner"]) == UserModel else data["owner"]
+        data["datafile"] = str(data["datafile"].id) if type(data["datafile"]) == DataFileModel else data["datafile"]
         return data
 
     @ma.post_load()
