@@ -12,7 +12,15 @@ def get_ner_resume_from_datafile(
             }
         },
         {
-            "$unwind": "extracted_entities"
+            '$sort': {
+              'created_at': -1
+            }
+        },
+        {
+            "$limit": 1
+        },
+        {
+            "$unwind": "$extracted_entities"
         },
         {
             "$sort": {
@@ -31,17 +39,17 @@ def get_ner_resume_from_datafile(
                 "datafile": {"$first": "$datafile"},
                 "created_at": {"$first": "$created_at"},
                 "total": {"$first": "$total"},
-                "extracted_entities": {"$push": "extracted_entities"}
+                "extracted_entities": {"$push": "$extracted_entities"}
             }
         }
     ]
     try:
         ner_resume = NerResumeModel.objects().aggregate(
-            search_pipe, allowDiskUser=True
+            search_pipe, allowDiskUse=True
         ).next()
         ner_resume_model = NerResumeSchema().load(ner_resume)
         return ner_resume_model
-    except:
+    except Exception as e:
         return None
 
 

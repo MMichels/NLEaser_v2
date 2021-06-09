@@ -1,7 +1,5 @@
-from importlib.resources import Resource
-
 from flask_jwt_extended import jwt_required, get_current_user
-from flask_restplus import Namespace, fields
+from flask_restplus import Namespace, fields, Resource
 
 from nleaser.api.error_handler import error_handler
 from nleaser.api.request_models import get_tasks_response_model, tasks_model
@@ -26,10 +24,10 @@ create_ner_resume_response_model = ns_ner.model(
 
 # GET
 get_ner_resume_response_model = get_response_model.copy()
-get_ner_resume_response_model["entities"] = fields.Nested(
+get_ner_resume_response_model["extracted_entities"] = fields.Nested(
     ns_ner.model("entity_model", entity_model), as_list=True
 )
-get_ner_resume_response_model = ns_ner(
+get_ner_resume_response_model = ns_ner.model(
     "get_ner_resume_response_model", get_ner_resume_response_model
 )
 

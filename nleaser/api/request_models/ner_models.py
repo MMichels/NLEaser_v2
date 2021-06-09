@@ -29,7 +29,7 @@ get_model.add_argument(
 get_model.add_argument(
     "order_by",
     required=False,
-    default="relevance",
+    default="count",
     choices=["content", "count", "entity"],
     location="args",
     type=str,

@@ -12,11 +12,12 @@ class EntityModel(me.EmbeddedDocument):
 
 class NerResumeModel(NLPExtractedDataModel):
     meta = {
-        'collection': 'ner'
+        'collection': 'ner_resume'
     }
     extracted_entities = me.EmbeddedDocumentListField(
         EntityModel
     )
+    total = me.fields.IntField(required=True)
 
 
 class EntitySchema(ma.Schema):
@@ -33,6 +34,7 @@ class NerResumeSchema(NLPExtractedDataSchema):
     extracted_entities = ma.fields.Nested(
         EntitySchema, many=True, required=True, unknow=ma.EXCLUDE
     )
+    total = ma.fields.Integer(required=True)
 
     @ma.post_load()
     def create_ner_resume(self, data, **kwargs):

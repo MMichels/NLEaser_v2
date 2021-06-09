@@ -18,5 +18,5 @@ class NerResumeCreateTaskSchema(TaskSchema):
     total = ma.fields.Integer(default=1)
 
     @ma.post_load()
-    def make_task(self, data, **kwargs):
+    def create_task(self, data, **kwargs):
         return NerResumeCreateTaskModel(**data)
