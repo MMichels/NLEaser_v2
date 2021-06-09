@@ -53,7 +53,6 @@ def get_datafile(user: UserModel, datafile_id: str) -> DataFileModel:
 
 
 def delete_data_file(user: UserModel, datafile_id: str):
-    datafile = get_datafile(user, datafile_id)
-    excluded = datafile.delete()
+    excluded = DataFileModel.objects(id=datafile_id, owner=user).delete()
 
     return excluded > 0
