@@ -13,6 +13,14 @@ def get_ngrams_from_datafile(
             }
         },
         {
+            '$sort': {
+              'created_at': -1
+            }
+        },
+        {
+            "$limit": 1
+        },
+        {
             "$unwind": "$ngrams"
         },
         {
@@ -38,7 +46,8 @@ def get_ngrams_from_datafile(
         }
     ]
     try:
-        ngram = ExtractedNGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
+        ngrams = ExtractedNGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True, batchSize=limit)
+        ngram = ngrams.next()
         ngram_model = ExtractedNGramsSchema().load(ngram)
 
         return ngram_model
