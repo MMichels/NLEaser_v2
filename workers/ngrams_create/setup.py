@@ -27,7 +27,7 @@ setup(
     ],
     packages=find_packages(
         where="../../../NLEaser_v2",
-        exclude=["api*", "workers.wordcloud_create", "workers.sentence_import"],
+        exclude=["api*", "workers.wordcloud_create", "workers.sentence_import", "workers.ner_extract"],
     ),
     package_dir={"": "../../../NLEaser_v2"},
     classifiers=[
