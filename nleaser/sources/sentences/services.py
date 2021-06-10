@@ -24,7 +24,7 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
     user = datafile.owner
     cipher = load_cipher(user)
 
-    datafile_import_task.status = "in_progress"
+    datafile_import_task.status = "queued"
     datafile_import_task.save()
     text_column = datafile.text_column
     try:
@@ -37,7 +37,7 @@ def import_sentences_from_df(df: DataFrame, datafile: DataFileModel,
                 "datafile": str(datafile.id),
                 "parent": str(datafile_import_task.id),
                 "total": 1,
-                "content": cipher.encrypt(row[text_column].encode()).decode(),
+                "content": cipher.encrypt(str(row[text_column]).encode()).decode(),
                 "index": index
             })
             sentence_import_task.save()

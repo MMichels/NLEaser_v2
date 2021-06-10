@@ -1,13 +1,24 @@
 from nleaser.models.datafile import DataFileModel
-from nleaser.models.ngrams import NGramsModel, NGramsSchema
+from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsModel, ExtractedNGramsSchema
 
 
-def get_ngrams_from_datafile(datafile: DataFileModel, skip: int, limit: int, order_by: str, order_ascending: bool) -> NGramsModel:
+def get_ngrams_from_datafile(
+        datafile: DataFileModel, skip: int, limit: int,
+        order_by: str, order_ascending: bool
+) -> ExtractedNGramsModel:
     search_pipeline = [
         {
             "$match": {
                 'datafile': datafile.id
             }
+        },
+        {
+            '$sort': {
+              'created_at': -1
+            }
+        },
+        {
+            "$limit": 1
         },
         {
             "$unwind": "$ngrams"
@@ -35,16 +46,17 @@ def get_ngrams_from_datafile(datafile: DataFileModel, skip: int, limit: int, ord
         }
     ]
     try:
-        ngram = NGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True).next()
-        ngram_model = NGramsSchema().load(ngram)
+        ngrams = ExtractedNGramsModel.objects().aggregate(search_pipeline, allowDiskUse=True, batchSize=limit)
+        ngram = ngrams.next()
+        ngram_model = ExtractedNGramsSchema().load(ngram)
 
         return ngram_model
-    except Exception as e:
+    except:
         return None
 
 
 def delete_ngrams_from_datafile(datafile: DataFileModel) -> bool:
-    deleted = NGramsModel.objects(
+    deleted = ExtractedNGramsModel.objects(
         datafile=datafile
     ).delete()
     return deleted > 0

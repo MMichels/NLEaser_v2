@@ -5,7 +5,7 @@ from nleaser.api.error_handler import error_handler
 from nleaser.api.request_models import get_tasks_response_model, tasks_model
 from nleaser.api.request_models.ngram_models import post_model, post_response_model, get_response_model, \
     delete_response_model, ngram_model, get_model
-from nleaser.models.ngrams import NGramsSchema
+from nleaser.models.nlp_extracted_data.ngrams import ExtractedNGramsSchema
 from nleaser.models.tasks.ngrams.create import NGramsCreateTaskSchema
 from nleaser.sources.logger import create_logger
 from nleaser.sources.ngrams import NGramsService
@@ -14,7 +14,8 @@ from nleaser.sources.tasks.ngrams.create import NGramsCreateTaskService
 logger = create_logger(__name__)
 ns_ngrams = Namespace(
     "NGrams",
-    "Namespace para criar, verificar e excluir modelos de NGrams dos conjuntos de texto")
+    "Namespace para extrair, paginar e excluir NGrams dos conjuntos de dados"
+)
 
 # POST
 create_ngram_response_model = ns_ngrams.model(
@@ -26,7 +27,9 @@ get_ngram_response_model = get_response_model.copy()
 get_ngram_response_model["ngrams"] = fields.Nested(
     ns_ngrams.model("ngram_model", ngram_model), as_list=True
 )
-get_ngram_response_model = ns_ngrams.model("get_ngram_response_model", get_ngram_response_model)
+get_ngram_response_model = ns_ngrams.model(
+    "get_ngram_response_model", get_ngram_response_model
+)
 
 # DELETE
 delete_ngram_response_model = ns_ngrams.model("delete_ngram_response_model", delete_response_model)
@@ -41,7 +44,7 @@ get_ngrams_tasks_response_model = ns_ngrams.model("get_ngrams_tasks_response_mod
 
 @ns_ngrams.route("/<string:datafile_id>", methods=["POST", "GET", "DELETE"])
 class NGramsResource(Resource):
-    ngrams_schema = NGramsSchema()
+    ngrams_schema = ExtractedNGramsSchema()
 
     @ns_ngrams.expect(post_model, validate=False)
     @ns_ngrams.marshal_with(create_ngram_response_model, code=201)
@@ -49,7 +52,7 @@ class NGramsResource(Resource):
     @jwt_required
     def post(self, datafile_id: str):
         """
-            Processa um novo NGram
+            Extrai os Ngrams de um conjunto de dados
         """
         args = post_model.parse_args()
         service = NGramsService(datafile_id)
@@ -64,7 +67,7 @@ class NGramsResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Recupera o ultimo Ngram Processado
+            Realizar a paginação entre os ngrams extraidos
         """
         args = get_model.parse_args()
         service = NGramsService(datafile_id)
@@ -94,7 +97,7 @@ class NGramsTaskResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Verifica as todas as requisições para processamento de NGrams do datafile
+            Verifica as todas as requisições de extração de NGrams
         """
         service = NGramsCreateTaskService(get_current_user())
         tasks = service.list_current_tasks(datafile_id)

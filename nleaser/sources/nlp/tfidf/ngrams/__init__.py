@@ -13,7 +13,7 @@ download('stopwords')
 
 def generate_ngrams(sentences: List[str], size: int, language: str) -> pd.DataFrame:
     sw = stopwords.words(language)
-    vec = CountVectorizer(min_df=2, max_df=0.8, stop_words=sw, ngram_range=(size, size))
+    vec = CountVectorizer(min_df=5, max_df=0.8, max_features=10000, stop_words=sw, ngram_range=(size, size))
     tfidf = TfidfTransformer(norm='l1')
 
     bag_of_words = vec.fit_transform(sentences)

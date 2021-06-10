@@ -6,7 +6,7 @@ from nleaser.api.request_models import tasks_model, get_tasks_response_model
 from nleaser.api.request_models.wordcloud_models import get_response_model, \
     delete_response_model, post_response_model
 
-from nleaser.models.wordcloud import WordcloudSchema
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudSchema
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskSchema
 from nleaser.sources.wordcloud import WordcloudService
 from nleaser.sources.tasks.wordcloud.create import WordcloudCreateTaskService
@@ -14,10 +14,15 @@ from nleaser.sources.logger import create_logger
 
 logger = create_logger(__name__)
 
-ns_wordcloud = Namespace("Wordcloud", "Namespace para criar, verificar e excluir wordclouds")
+ns_wordcloud = Namespace(
+    "Wordcloud",
+    "Namespace para criar, visualizar e excluir wordclouds"
+)
 
 # POST
-create_wordcloud_response_model = ns_wordcloud.model("create_wordcloud_response_model", post_response_model)
+create_wordcloud_response_model = ns_wordcloud.model(
+    "create_wordcloud_response_model", post_response_model
+)
 
 # GET
 get_wordclouds_response_model = ns_wordcloud.model("get_wordcloud_response_model", get_response_model)
@@ -43,7 +48,7 @@ class WordcloudsResource(Resource):
     @jwt_required
     def post(self, datafile_id):
         """
-            Processa um novo Wordcloud
+            Gera um novo Wordclod
         """
         service = WordcloudService(datafile_id)
 
@@ -57,7 +62,7 @@ class WordcloudsResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Recupera o ultimo Wordcloud Processado
+            Recupera a imagem jpg do Wordcloud gerado, em Base64
         """
         service = WordcloudService(datafile_id)
         wc = service.get_wordcloud()
@@ -87,7 +92,7 @@ class WordCloudsTaskResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-            Verifica todas as requisições para processamento de Wordcloud do datafile
+            Verifica todas as requisições para extração de Wordclouds
         """
         service = WordcloudCreateTaskService(get_current_user())
         tasks = service.list_current_tasks(datafile_id)

@@ -18,6 +18,6 @@ def generate_wordcloud(sentences, language) -> WordCloud:
     text = ' '.join(sentences)
     wcloud = WordCloud(stopwords=stop_wds, collocations=True,
                        margin=4, max_words=75,
-                       width=1968, height=1080)
+                       width=1968, height=1080, background_color="white", colormap="Set1")
     wcloud.generate_from_text(text)
     return wcloud

@@ -39,7 +39,7 @@ class DataFileService:
 
     def delete_datafile(self, datafile_id: str) -> bool:
         deleted = delete_data_file(self.user, datafile_id)
-        return True
+        return deleted
 
     def get_sentences(self, datafile_id: str, skip: int, limit: int):
         datafile = self.get_datafile(datafile_id)

@@ -7,12 +7,12 @@ from typing import List
 from nleaser.models.user import UserModel
 from nleaser.models.sentence import SentenceModel
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
-from nleaser.models.wordcloud import WordcloudModel, WordcloudSchema
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudModel, WordcloudSchema
 
 from nleaser.sources.nlp.tfidf.wordcloud import generate_wordcloud
 from nleaser.sources.secure import load_cipher
 
-logger = logging.getLogger("wordcloud_create")
+logger = logging.getLogger("_wordcloud_create")
 
 
 def create_base64_wordcloud(user: UserModel, sentences: List[SentenceModel], language: str) -> bytes:

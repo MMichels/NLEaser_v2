@@ -174,7 +174,7 @@ class DataManagementTaskResource(Resource):
     @jwt_required
     def get(self, datafile_id):
         """
-        Retorna a as tarefas de upload relacionadas a esse arquivo (progresso do upload)
+            Retorna o status do upload do dataset
         """
         service = DataFileUploadTaskService(get_current_user())
         tasks = service.list_current_tasks(datafile_id)
