@@ -3,13 +3,6 @@ from nleaser.api.request_models import make_response_model
 
 
 ##### POST MODELS #####
-post_model = {
-    "datafile_id": fields.String(
-        required=True,
-        description="id do arquivo de sentenças para gerar o wordcloud"
-    )
-}
-
 post_response_model = {
     "create_wc_task_id": fields.String(
         required=True,

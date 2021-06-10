@@ -1,7 +1,7 @@
 from flask_jwt_extended import get_current_user
 
 from nleaser.models.tasks.wordcloud.create import WordcloudCreateTaskModel
-from nleaser.models.wordcloud import WordcloudModel
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudModel
 from nleaser.sources.datafile import DataFileService
 from nleaser.sources.secure import load_cipher
 from nleaser.sources.tasks.wordcloud.create import WordcloudCreateTaskService

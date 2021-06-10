@@ -1,7 +1,7 @@
 from mongoengine import QuerySet
 
 from nleaser.models.datafile import DataFileModel
-from nleaser.models.wordcloud import WordcloudModel
+from nleaser.models.nlp_extracted_data.wordcloud import WordcloudModel
 
 
 def get_wordclouds_from_datafile(datafile: DataFileModel) -> QuerySet:

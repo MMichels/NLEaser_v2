@@ -17,6 +17,7 @@ setup(
     author_email="michels09@hotmail.com, lucas2809@live.com",
     python_requires=">=3.6",
     install_requires=[
+        "cryptography~=3.4.6",
         "marshmallow==3.7.1",
         "mongoengine==0.20.0",
         "nltk==3.4.4",
@@ -25,7 +26,7 @@ setup(
     ],
     packages=find_packages(
         where="../../../NLEaser_v2",
-        exclude=["api*", "workers.sentence_import"]
+        exclude=["api*", "workers.sentence_import", "workers.ngrams_create", "workers.ner_extract"]
     ),
     package_dir={"": "../../../NLEaser_v2"},
     classifiers=[

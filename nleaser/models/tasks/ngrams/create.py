@@ -19,12 +19,6 @@ class NGramsCreateTaskSchema(TaskSchema):
     size = ma.fields.Integer(required=True, validation=validate.Range(1, 4))
     total = ma.fields.Integer(default=1)
 
-    @ma.pre_load()
-    def prepare_data(self, data, **kwargs):
-        data["owner"] = str(data["owner"].id) if data["owner"] else ""
-        data["datafile"] = str(data["datafile"].id) if data["datafile"] else ""
-        return data
-
     @ma.post_load()
     def create_task(self, data, **kwargs):
         return NGramsCreateTaskModel(**data)
