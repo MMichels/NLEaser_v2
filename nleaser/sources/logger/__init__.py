@@ -1,6 +1,8 @@
 import sys, os
 import logging
 from datetime import datetime
+
+from bson import InvalidDocument
 from mongoengine import Document, StringField, DateTimeField, DynamicField, IntField
 
 
@@ -41,8 +43,12 @@ class DBLogModel(Document):
         try:
             self.exceptionDetails = vars(error_descryption)
             super().save()
-        except Exception:
+        except InvalidDocument as id:
+            self.args = str(self.args)
+            super().save()
+        except Exception as e:
             self.exceptionDetails = str(self.exceptionDetails)
+            super().save()
 
 
 class DBLogHandler(logging.Handler):

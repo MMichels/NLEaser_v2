@@ -18,7 +18,7 @@ def error_handler(logger: Logger):
                 logger.error(
                     "Os dados recebidos estão fora do padrão do endpoint",
                     exc_info=True,
-                    extra={"received_args": request.get_json()}
+                    extra={"received_args": {"args": request.args, "json": request.get_json()}}
                 )
                 return {
                            "status": "bad_request",
