@@ -18,6 +18,8 @@ def import_data_file(
     if format != 'txt':
         if not text_column in df.columns:
             raise TextColumnNotFound("Não foi possivel encontrar a coluna " + text_column + " no conjunto de dados")
+    else:
+        text_column = df.columns[0]
 
     data_file: DataFileModel = datafile_schema.load(
         {

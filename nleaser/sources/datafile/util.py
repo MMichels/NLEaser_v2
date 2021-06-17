@@ -8,10 +8,12 @@ def open_file(file: FileStorage, format: str, sep: str):
     df = None
     if format == 'txt':
         try:
-            with open(file) as f:
-                sentences = f.readlines()
+
+            with file.stream as fs:
+                sentences = fs.readlines()
+                decoded_sentences = map(lambda x: x.decode("utf-8"), sentences)
                 df = pd.DataFrame(
-                    sentences,
+                    decoded_sentences,
                     columns=['sentences']
                 )
         except Exception as e:
@@ -19,6 +21,8 @@ def open_file(file: FileStorage, format: str, sep: str):
     elif format == 'csv':
         try:
             df = pd.read_csv(file, sep=sep)
+        except UnicodeDecodeError as ude:
+            raise FileReadException("O arquivo precisa estar codificado em UTF-8", file, ude)
         except Exception as e:
             raise FileReadException("Erro ao ler o arquivo", file, e)
     elif format == 'xlsx':
