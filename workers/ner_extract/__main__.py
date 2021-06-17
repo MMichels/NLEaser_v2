@@ -3,7 +3,7 @@ from nleaser.sources.logger import create_logger
 from nleaser.sources.rabbit.consumer import RabbitConsumer
 from workers.ner_extract import ner_resume_create_consumer
 
-logger = create_logger("ner_resume_create")
+logger = create_logger("ner_extract")
 
 
 if __name__ == '__main__':
