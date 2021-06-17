@@ -25,7 +25,7 @@ class NerResumeService:
         )
         if ner_resume:
             return ner_resume
-        raise FileNotFoundError("Nenhuma extração de NER encontrada")
+        raise FileNotFoundError("Ooops, nada por aqui ainda....")
 
     def delete_ner_resume(self) -> bool:
         deleted = delete_ner_resume_from_datafile(self.datafile)

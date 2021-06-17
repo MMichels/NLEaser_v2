@@ -23,7 +23,7 @@ class NGramsService:
         ngrams = get_ngrams_from_datafile(self.datafile, skip, limit, order_by, bool(order_ascending))
         if ngrams:
             return ngrams
-        raise FileNotFoundError("Nenhum NGram encontrado")
+        raise FileNotFoundError("Ooops, nada por aqui ainda....")
 
     def delete_ngram(self) -> bool:
         deleted = delete_ngrams_from_datafile(self.datafile)

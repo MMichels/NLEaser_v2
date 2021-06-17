@@ -26,7 +26,7 @@ class WordcloudService:
             wc.base64_image = private_cipher.decrypt(wc.base64_image.encode()).decode()
             return wc
         else:
-            raise FileNotFoundError("Nenhum wordcloud encontrado")
+            raise FileNotFoundError("Ooops, nada por aqui ainda....")
 
     def delete_wordcloud(self) -> bool:
         deleted = delete_wordclouds_from_datafile(self.datafile)
