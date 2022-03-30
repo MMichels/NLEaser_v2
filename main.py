@@ -1,4 +1,4 @@
-from nleaser.api import create_api
+from nleaser_api import create_api
 
 app = create_api()
 
